@@ -466,3 +466,15 @@ Firebase 설정 절차와 Firestore 저장 구조는 `docs/firebase-auth-setup.m
 - 남은 문제
   - 실제 Firebase 프로젝트 값 입력 후 GitHub Pages에서 이메일 로그인 / Google 로그인 실사용 확인 필요
   - 결제, 유료 블링 지급, ledger는 Cloud Functions 또는 별도 서버 권한 코드로 분리 필요
+
+## 2026-04-19e Firebase 프로젝트 설정 반영
+- 수정 목적: Firebase 콘솔에서 발급된 PROJECT: HW 웹 앱 설정값을 GitHub Pages 배포본에 연결
+- 수정 파일: `firebase-config.js`, `js/firebase.js`, `index.html`, `main.js`, `README.md`, `DEPLOY_NOTE.txt`
+- 해결한 문제
+  - Firebase 프로젝트 `project-hw-6221d` 설정값 반영
+  - Firebase Web SDK CDN 버전을 `12.12.0`으로 갱신
+  - 배포 확인용 캐시 버전 기준을 `20260419d`로 갱신
+- 남은 문제
+  - Firebase Console에서 Email/Password, Google 제공자 활성화 확인 필요
+  - Authorized domains에 `cometodlite.github.io` 등록 확인 필요
+  - Firestore Database 생성 및 Security Rules 적용 필요

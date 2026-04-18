@@ -32,8 +32,8 @@ GitHub Pages 배포 안내
 - 결제 / Mock 결제 기능은 별도 API 또는 Cloud Functions 연결 전까지 강조하지 않습니다.
 
 배포 전 확인
-- index.html이 style.css?v=20260419c, main.js?v=20260419c를 참조하는지 확인합니다.
-- main.js의 data JSON 경로가 ?v=20260419c를 사용하는지 확인합니다.
+- index.html이 style.css?v=20260419d, main.js?v=20260419d를 참조하는지 확인합니다.
+- main.js의 data JSON 경로가 ?v=20260419d를 사용하는지 확인합니다.
 - firebase-config.js에 실제 Firebase 설정값을 넣었는지 확인합니다.
 - 구형 모바일 네비(mobile-hcsim-nav, mobile-hcsim-reset-nav)가 다시 추가되지 않았는지 확인합니다.
 - 모바일은 STATUS / ACTION / BAG / SHOP / LOG 5패널 구조로 유지합니다.

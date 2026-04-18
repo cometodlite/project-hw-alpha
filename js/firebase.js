@@ -1,6 +1,6 @@
 import { state } from "./state.js";
 
-const FIREBASE_SDK_VERSION = "10.12.5";
+const FIREBASE_SDK_VERSION = "12.12.0";
 const FIREBASE_CONFIG_STORAGE_KEY = "project-hw-firebase-config";
 const PLAYER_STATES_COLLECTION = "player_states";
 const USERS_COLLECTION = "users";
@@ -20,7 +20,8 @@ function getFirebaseConfig() {
     projectId: String(config.projectId || "").trim(),
     storageBucket: String(config.storageBucket || "").trim(),
     messagingSenderId: String(config.messagingSenderId || "").trim(),
-    appId: String(config.appId || "").trim()
+    appId: String(config.appId || "").trim(),
+    measurementId: String(config.measurementId || "").trim()
   };
   if (!normalized.apiKey || !normalized.authDomain || !normalized.projectId || !normalized.appId) {
     return null;
