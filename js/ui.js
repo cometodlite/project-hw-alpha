@@ -393,6 +393,7 @@ export function initUI() {
   el.coinValue = document.getElementById("coin-value");
   el.blingValue = document.getElementById("bling-value");
   el.bgmTitle = document.getElementById("bgm-title");
+  el.authPanel = document.querySelector(".auth-panel");
   el.authStateText = document.getElementById("auth-state-text");
   el.authServerText = document.getElementById("auth-server-text");
   el.authForm = document.getElementById("auth-form");
@@ -600,16 +601,21 @@ function renderAuthPanel() {
   const server = state.ui.server;
   const authenticated = auth.status === "authenticated";
   const apiBase = server.apiBase || getApiBase();
+  const apiMissing = !apiBase;
+  const apiOffline = Boolean(apiBase) && server.mode === "offline" && !authenticated;
 
   el.authStateText.textContent = authenticated
     ? `${auth.displayName || auth.email || "로그인됨"}`
     : "게스트";
   el.authServerText.textContent = authenticated
     ? `서버 저장 사용 중 · ${apiBase || "API 미설정"}`
-    : (server.message || (apiBase ? "로그인하면 서버 저장" : "로컬 저장"));
+    : (apiMissing ? "로컬 저장으로 플레이 중" : (server.message || "로그인하면 서버 저장"));
 
+  el.authPanel?.classList.toggle("auth-local-only", apiMissing);
+  el.authPanel?.classList.toggle("auth-offline", apiOffline);
+  el.authPanel?.classList.toggle("auth-full", Boolean(apiBase) && !apiOffline);
   el.authForm?.classList.toggle("is-authenticated", authenticated);
-  const canUseAuth = Boolean(apiBase) && !authBusy;
+  const canUseAuth = Boolean(apiBase) && !apiOffline && !authBusy;
   [el.authEmail, el.authPassword, el.authDisplayName].forEach((input) => {
     if (input) input.disabled = authBusy;
   });

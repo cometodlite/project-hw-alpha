@@ -38,7 +38,7 @@ npm run dev
 localStorage.setItem("project-hw-api-base", "https://your-api.example.com");
 ```
 
-GitHub Pages 배포본은 정적 파일만 구동합니다. 별도 API 서버를 연결하기 전까지 계정 / Mock 결제 기능은 비활성 상태로 남고, 생활 루프와 저장 / 불러오기는 브라우저 로컬 저장으로 동작합니다.
+GitHub Pages 배포본은 정적 파일만 구동합니다. 별도 API 서버를 연결하기 전까지 계정 / Mock 결제 기능은 첫 화면에서 강조하지 않고, 생활 루프와 저장 / 불러오기는 브라우저 로컬 저장으로 동작합니다.
 
 ## 다음 확장 추천
 - 실제 오디오 파일 연결
@@ -442,3 +442,13 @@ GitHub Pages 배포본은 정적 파일만 구동합니다. 별도 API 서버를
   - 로컬 서버 테스트 기본 origin을 `http://127.0.0.1:8787`로 정리
 - 남은 문제
   - GitHub Pages 실제 URL에서 모바일 / iPad / 데스크톱 실기기 확인 필요
+
+## 2026-04-19c GitHub Pages 첫 화면 정리
+- 수정 목적: API 없는 Pages 방문자가 로그인 폼보다 플레이 화면을 먼저 보도록 정리
+- 수정 파일: `index.html`, `style.css`, `main.js`, `js/ui.js`, `README.md`, `DEPLOY_NOTE.txt`
+- 해결한 문제
+  - API 주소가 없거나 API 연결 실패 시 로그인 / 회원가입 폼을 축소하고 로컬 저장 안내만 표시
+  - 데스크톱 첫 화면의 최대폭, 패널 폭, 여백, 카드 반경을 조정해 화면 밀도 완화
+  - 배포 확인용 캐시 버전 기준을 `20260419b`로 갱신
+- 남은 문제
+  - GitHub Pages 실제 URL에서 iPhone 세로, iPad 세로, iPad 가로 가독성 재확인 필요

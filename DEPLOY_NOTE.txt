@@ -27,11 +27,11 @@ GitHub Pages 배포 안내
 - 개발 DB는 기본값 `server/data/hw.sqlite`를 사용합니다.
 - 로컬에서 `127.0.0.1` 또는 `localhost`로 접속하면 클라이언트는 `http://127.0.0.1:3000`을 기본 API 주소로 사용합니다.
 - GitHub Pages 배포본은 별도 API 주소가 없으면 기존 로컬 저장으로 fallback합니다.
-- 실서버 호스팅 전까지 계정 / Mock 결제 기능은 비활성 또는 안내 상태로 남습니다.
+- 실서버 호스팅 전까지 계정 / Mock 결제 기능은 첫 화면에서 강조하지 않고, 로컬 저장 안내 상태로 남습니다.
 
 배포 전 확인
-- index.html이 style.css?v=20260419a, main.js?v=20260419a를 참조하는지 확인합니다.
-- main.js의 data JSON 경로가 ?v=20260419a를 사용하는지 확인합니다.
+- index.html이 style.css?v=20260419b, main.js?v=20260419b를 참조하는지 확인합니다.
+- main.js의 data JSON 경로가 ?v=20260419b를 사용하는지 확인합니다.
 - 구형 모바일 네비(mobile-hcsim-nav, mobile-hcsim-reset-nav)가 다시 추가되지 않았는지 확인합니다.
 - 모바일은 STATUS / ACTION / BAG / SHOP / LOG 5패널 구조로 유지합니다.
 - iPad 가로와 PC / Mac 웹은 기존 데스크톱 대시보드 구조를 유지합니다.
@@ -43,3 +43,4 @@ GitHub Pages 배포 안내
 - iPad 세로에서 모바일 5패널 구조가 유지되는지 확인합니다.
 - iPad 가로에서 데스크톱 대시보드 구조가 유지되는지 확인합니다.
 - API 서버가 없는 Pages 환경에서도 일반 생활 루프와 로컬 저장이 정상 동작하는지 확인합니다.
+- API 서버가 없는 Pages 환경에서는 로그인 / 회원가입 폼이 크게 노출되지 않는지 확인합니다.

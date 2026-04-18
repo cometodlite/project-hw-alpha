@@ -1978,3 +1978,198 @@ body {
 .view-switch [data-desktop-view] {
   touch-action: manipulation;
 }
+
+/* 2026-04-19 GitHub Pages first-screen polish */
+body {
+  overflow: auto;
+}
+
+#app {
+  max-width: 1280px;
+  min-height: 100vh;
+  height: auto;
+  padding: 22px 32px 34px;
+  overflow: visible;
+}
+
+h1 {
+  font-size: 2.75rem;
+}
+
+button,
+select,
+.card,
+.status-card,
+.mobile-panel-card,
+.mobile-list-card,
+.mobile-shop-item,
+.mobile-bag-item,
+.mobile-log-item {
+  border-radius: 8px;
+}
+
+.topbar {
+  grid-template-columns: minmax(280px, 0.82fr) minmax(340px, 0.72fr);
+  gap: 22px;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+.status-grid {
+  max-width: 570px;
+  margin-left: auto;
+}
+
+.auth-panel.auth-local-only,
+.auth-panel.auth-offline {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  margin: -4px 0 16px;
+  padding: 0;
+  background: transparent;
+  border: 0;
+  box-shadow: none;
+  backdrop-filter: none;
+}
+
+.auth-panel.auth-local-only .auth-form,
+.auth-panel.auth-offline .auth-form {
+  display: none;
+}
+
+.auth-panel.auth-local-only .auth-status-row,
+.auth-panel.auth-offline .auth-status-row {
+  display: grid;
+  grid-template-columns: 1fr;
+  width: min(100%, 300px);
+  gap: 0;
+}
+
+.auth-panel.auth-local-only .auth-status-row > div:first-child,
+.auth-panel.auth-offline .auth-status-row > div:first-child {
+  display: none;
+}
+
+.auth-panel.auth-local-only .auth-status-row > div,
+.auth-panel.auth-offline .auth-status-row > div {
+  padding: 8px 10px;
+  background: rgba(255,255,255,0.7);
+  border-radius: 8px;
+  box-shadow: none;
+}
+
+.auth-panel.auth-local-only .auth-status-row strong,
+.auth-panel.auth-offline .auth-status-row strong {
+  font-size: 0.86rem;
+}
+
+.dashboard-grid {
+  grid-template-columns: 250px minmax(440px, 1fr) 320px;
+  gap: 16px;
+  align-items: start;
+  flex: none;
+  min-height: 0;
+}
+
+.left-panel,
+.center-panel,
+.right-panel {
+  height: auto;
+  max-height: none;
+}
+
+.left-panel,
+.right-panel {
+  padding: 16px;
+}
+
+.center-panel {
+  overflow: visible;
+}
+
+.hero {
+  min-height: 540px !important;
+  flex: none;
+  overflow: visible;
+  padding: 18px;
+}
+
+.hero-top {
+  margin-bottom: 16px;
+}
+
+.scene-visual.upgraded {
+  gap: 12px;
+}
+
+.scene-panel,
+.scene-panel.large,
+.scene-panel.radio-panel {
+  padding: 14px;
+}
+
+.right-panel {
+  max-height: none;
+  overflow: visible;
+}
+
+.compact-log {
+  margin-top: 12px;
+}
+
+@media (max-width: 1180px) {
+  #app {
+    padding: 18px 22px 28px;
+  }
+
+  .dashboard-grid {
+    grid-template-columns: 230px minmax(420px, 1fr) 300px;
+    gap: 14px;
+  }
+}
+
+@media (max-width: 1024px) {
+  h1 {
+    font-size: 2.25rem;
+  }
+
+  .topbar {
+    grid-template-columns: 1fr;
+  }
+
+  .status-grid {
+    max-width: none;
+    margin-left: 0;
+  }
+
+  .dashboard-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .hero {
+    min-height: 0 !important;
+  }
+}
+
+@media (max-width: 760px), (min-width: 761px) and (max-width: 1024px) and (orientation: portrait) and (pointer: coarse) {
+  #app {
+    min-height: 100vh;
+    padding: 8px !important;
+  }
+
+  h1 {
+    font-size: 2rem;
+  }
+
+  .auth-panel.auth-local-only,
+  .auth-panel.auth-offline {
+    justify-content: stretch;
+    margin: 0 0 8px;
+  }
+
+  .auth-panel.auth-local-only .auth-status-row,
+  .auth-panel.auth-offline .auth-status-row {
+    width: 100%;
+  }
+}
