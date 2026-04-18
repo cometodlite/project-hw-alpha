@@ -1,0 +1,112 @@
+[
+  {
+    "productId": "bling_pack_1000_krw",
+    "name": "블링 1000",
+    "type": "bling_pack",
+    "description": "유료 블링 1000개를 충전합니다.",
+    "price": 11000,
+    "currency": "KRW",
+    "rewardData": {
+      "paidBling": 1000
+    },
+    "isRepeatable": true,
+    "saleStartAt": null,
+    "saleEndAt": null,
+    "isActive": true,
+    "tags": [
+      "bling",
+      "web"
+    ]
+  },
+  {
+    "productId": "cozy_room_starter_pack",
+    "name": "포근한 방 스타터 팩",
+    "type": "furniture_pack",
+    "description": "초기 하우징을 꾸미기 좋은 가구와 코인을 지급합니다.",
+    "price": 5500,
+    "currency": "KRW",
+    "rewardData": {
+      "coin": 300,
+      "items": [
+        {
+          "itemId": "tea-set",
+          "amount": 1
+        },
+        {
+          "itemId": "soft-lamp",
+          "amount": 1
+        }
+      ],
+      "entitlements": [
+        {
+          "entitlementType": "furniture_pack",
+          "entitlementKey": "cozy_room_starter_pack"
+        }
+      ]
+    },
+    "isRepeatable": false,
+    "saleStartAt": null,
+    "saleEndAt": null,
+    "isActive": true,
+    "tags": [
+      "housing",
+      "starter"
+    ]
+  },
+  {
+    "productId": "spring_walk_season_pack_2026",
+    "name": "봄 산책 시즌 팩",
+    "type": "season_pack",
+    "description": "기간 한정 하우징 아이템과 무료 블링 보너스를 지급합니다.",
+    "price": 9900,
+    "currency": "KRW",
+    "rewardData": {
+      "freeBling": 120,
+      "items": [
+        {
+          "itemId": "sunrise-curtain",
+          "amount": 1
+        }
+      ],
+      "entitlements": [
+        {
+          "entitlementType": "season_pack",
+          "entitlementKey": "spring_walk_2026"
+        }
+      ]
+    },
+    "isRepeatable": false,
+    "saleStartAt": "2026-04-16T00:00:00+09:00",
+    "saleEndAt": "2026-05-31T23:59:59+09:00",
+    "isActive": true,
+    "tags": [
+      "season",
+      "housing"
+    ]
+  },
+  {
+    "productId": "small_support_pack",
+    "name": "작은 응원 팩",
+    "type": "support_pack",
+    "description": "개발 응원용 상품입니다. 감사 보상으로 무료 블링과 코인을 지급합니다.",
+    "price": 3300,
+    "currency": "KRW",
+    "rewardData": {
+      "coin": 150,
+      "freeBling": 30,
+      "entitlements": [
+        {
+          "entitlementType": "support_pack",
+          "entitlementKey": "small_support_badge"
+        }
+      ]
+    },
+    "isRepeatable": true,
+    "saleStartAt": null,
+    "saleEndAt": null,
+    "isActive": true,
+    "tags": [
+      "support"
+    ]
+  }
+]

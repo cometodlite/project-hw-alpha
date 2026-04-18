@@ -1,0 +1,55 @@
+{
+  "gathering": [
+    {
+      "itemId": "herb",
+      "weight": 40,
+      "minAmount": 1,
+      "maxAmount": 3,
+      "rarity": "common"
+    },
+    {
+      "itemId": "flower",
+      "weight": 28,
+      "minAmount": 1,
+      "maxAmount": 2,
+      "rarity": "common"
+    },
+    {
+      "itemId": "wood",
+      "weight": 24,
+      "minAmount": 1,
+      "maxAmount": 3,
+      "rarity": "common"
+    },
+    {
+      "itemId": "dew_mushroom",
+      "weight": 8,
+      "minAmount": 1,
+      "maxAmount": 1,
+      "rarity": "rare"
+    }
+  ],
+  "fishing": [
+    {
+      "itemId": "fish",
+      "weight": 50,
+      "minAmount": 1,
+      "maxAmount": 2,
+      "rarity": "common"
+    },
+    {
+      "itemId": "shrimp",
+      "weight": 35,
+      "minAmount": 1,
+      "maxAmount": 2,
+      "rarity": "common"
+    },
+    {
+      "itemId": "silver_koi",
+      "weight": 15,
+      "minAmount": 1,
+      "maxAmount": 1,
+      "rarity": "rare"
+    }
+  ]
+}

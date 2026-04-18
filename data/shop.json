@@ -1,0 +1,51 @@
+[
+  {
+    "id": "carrot_seed",
+    "name": "당근 씨앗",
+    "description": "성장 20초 · 수확 2~4개",
+    "currency": "coin",
+    "price": 24
+  },
+  {
+    "id": "wheat_seed",
+    "name": "밀 씨앗",
+    "description": "성장 15초 · 수확 2~3개",
+    "currency": "coin",
+    "price": 18
+  },
+  {
+    "id": "apple_seed",
+    "name": "사과 묘목",
+    "description": "농사 숙련도 5 해금 · 성장 30초 · 수확 1~2개",
+    "currency": "coin",
+    "price": 32
+  },
+  {
+    "id": "golden_seed",
+    "name": "황금 씨앗",
+    "description": "농사 숙련도 10 해금 · 성장 36초 · 황금 사과 확률",
+    "currency": "coin",
+    "price": 60
+  },
+  {
+    "id": "tea-set",
+    "name": "티 세트",
+    "description": "하우징용 가구",
+    "currency": "coin",
+    "price": 120
+  },
+  {
+    "id": "soft-lamp",
+    "name": "포근한 램프",
+    "description": "조명 가구",
+    "currency": "coin",
+    "price": 180
+  },
+  {
+    "id": "sunrise-curtain",
+    "name": "일출 커튼",
+    "description": "특별 꾸미기 아이템",
+    "currency": "bling",
+    "price": 12
+  }
+]

@@ -1,0 +1,416 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>PROJECT: HW</title>
+  <link rel="icon" href="data:," />
+  <link rel="stylesheet" href="./style.css?v=20260419a" />
+</head>
+<body>
+  <div id="app">
+    <header class="topbar">
+      <div class="brand-block">
+        <p class="eyebrow">Healing World</p>
+        <h1>PROJECT: HW</h1>
+        <p class="subtitle">단일 화면 대시보드형 힐링 생활형 RPG 프로토타입</p>
+      </div>
+
+      <div class="status-grid">
+        <div class="status-card">
+          <span class="label">현재 시간</span>
+          <strong id="current-time">--:--</strong>
+        </div>
+        <div class="status-card">
+          <span class="label">코인</span>
+          <strong id="coin-value">0</strong>
+        </div>
+        <div class="status-card">
+          <span class="label">블링</span>
+          <strong id="bling-value">0</strong>
+        </div>
+        <div class="status-card">
+          <span class="label">현재 BGM</span>
+          <strong id="bgm-title">없음</strong>
+        </div>
+      </div>
+    </header>
+
+    <section class="auth-panel card" aria-label="계정 연결">
+      <div class="auth-status-row">
+        <div>
+          <span class="label">계정 상태</span>
+          <strong id="auth-state-text">확인 중</strong>
+        </div>
+        <div>
+          <span class="label">저장 방식</span>
+          <strong id="auth-server-text">로컬 저장</strong>
+        </div>
+      </div>
+
+      <form id="auth-form" class="auth-form">
+        <label>
+          <span>이메일</span>
+          <input id="auth-email" type="email" autocomplete="email" placeholder="test@example.com" />
+        </label>
+        <label>
+          <span>비밀번호</span>
+          <input id="auth-password" type="password" autocomplete="current-password" placeholder="8자 이상" />
+        </label>
+        <label>
+          <span>닉네임</span>
+          <input id="auth-display-name" type="text" autocomplete="nickname" placeholder="테스트" />
+        </label>
+        <div class="auth-actions">
+          <button id="btn-auth-register" type="button">회원가입</button>
+          <button id="btn-auth-login" type="button">로그인</button>
+          <button id="btn-auth-logout" type="button" class="secondary">로그아웃</button>
+          <button id="btn-auth-load-server" type="button" class="secondary">서버 불러오기</button>
+        </div>
+      </form>
+    </section>
+
+    
+<section id="mobile-5panel-app" class="mobile-5panel-app" aria-label="모바일 5패널 앱">
+  <section class="mobile-panel active" data-mobile-panel="status">
+    <div class="mobile-panel-card">
+      <div class="section-head">
+        <h3>상태</h3>
+        <span class="section-tip">현재 상태 요약</span>
+      </div>
+      <div class="mobile-list">
+        <div class="mobile-list-card">
+          <strong>현재 공간</strong>
+          <div id="m5-status-scene-title">마을 광장</div>
+          <small id="m5-status-scene-detail">공간 정보를 불러오는 중입니다.</small>
+        </div>
+        <div class="mobile-list-card">
+          <strong>생활 숙련도</strong>
+          <div id="m5-status-life">불러오는 중입니다.</div>
+        </div>
+        <div class="mobile-list-card">
+          <strong>집 분위기</strong>
+          <div id="m5-status-home">불러오는 중입니다.</div>
+        </div>
+        <div class="mobile-list-card">
+          <strong>현재 BGM</strong>
+          <div id="m5-status-bgm">불러오는 중입니다.</div>
+        </div>
+      </div>
+      <div class="mobile-metric-row">
+        <div class="mobile-metric">
+          <span>재화</span>
+          <strong id="m5-status-currency">코인 0 · 블링 0</strong>
+        </div>
+        <div class="mobile-metric">
+          <span>밭</span>
+          <strong id="m5-status-farm">확인 중</strong>
+        </div>
+        <div class="mobile-metric">
+          <span>가방</span>
+          <strong id="m5-status-bag">0종</strong>
+        </div>
+      </div>
+      <div class="mobile-scene-switch view-switch mobile-only-scene-switch">
+        <button class="tab-button active" data-m5-view="town">마을</button>
+        <button class="tab-button" data-m5-view="farm">밭</button>
+        <button class="tab-button" data-m5-view="home">집</button>
+      </div>
+    </div>
+  </section>
+
+  <section class="mobile-panel" data-mobile-panel="action">
+    <div class="mobile-panel-card">
+      <div class="section-head">
+        <h3>행동</h3>
+        <span class="section-tip">즉시 실행</span>
+      </div>
+      <div class="mobile-action-summary">
+        <div>
+          <span>현재 공간</span>
+          <strong id="m5-action-scene">마을 광장</strong>
+        </div>
+        <div>
+          <span>생활 숙련도</span>
+          <strong id="m5-action-skill">채집 1 · 낚시 1 · 농사 1</strong>
+        </div>
+      </div>
+      <div class="mobile-action-section mobile-action-section-life">
+        <h4>생활 행동</h4>
+        <div class="mobile-action-grid">
+          <button id="m5-btn-gather">숲에서 채집하기</button>
+          <button id="m5-btn-fish">연못에서 낚시하기</button>
+          <button id="m5-btn-sell">수집품 판매하기</button>
+        </div>
+      </div>
+      <div class="mobile-action-section mobile-action-section-farm">
+        <h4>농사</h4>
+        <select id="m5-seed-select"></select>
+        <div class="mobile-action-grid">
+          <button id="m5-btn-plant">씨앗 심기</button>
+          <button id="m5-btn-harvest">수확하기</button>
+        </div>
+        <div id="m5-farm-status" class="mini-note">밭 상태를 불러오는 중입니다.</div>
+      </div>
+    </div>
+  </section>
+
+  <section class="mobile-panel" data-mobile-panel="bag">
+    <div class="mobile-panel-card">
+      <div class="section-head">
+        <h3>가방</h3>
+        <span class="section-tip">보유 자산 관리</span>
+      </div>
+      <div id="m5-bag-summary" class="mobile-panel-summary">보유 아이템을 불러오는 중입니다.</div>
+      <div class="mobile-subtabs">
+        <button class="mobile-subtab active" data-mobile-bag-tab="inventory">
+          <span>인벤토리</span>
+          <small id="m5-bag-inventory-count">0종</small>
+        </button>
+        <button class="mobile-subtab" data-mobile-bag-tab="housing">
+          <span>하우징</span>
+          <small id="m5-bag-housing-count">0/4</small>
+        </button>
+      </div>
+
+      <div class="mobile-bag-view active" data-mobile-bag-view="inventory">
+        <div id="m5-bag-inventory-list" class="mobile-list"></div>
+      </div>
+
+      <div class="mobile-bag-view" data-mobile-bag-view="housing">
+        <div id="m5-housing-slots" class="housing-grid"></div>
+        <div class="stack">
+          <select id="m5-housing-item-select"></select>
+          <div class="grid-2">
+            <button data-m5-place-slot="1">1번 칸</button>
+            <button data-m5-place-slot="2">2번 칸</button>
+            <button data-m5-place-slot="3">3번 칸</button>
+            <button data-m5-place-slot="4">4번 칸</button>
+          </div>
+          <button id="m5-btn-clear-housing">배치 초기화</button>
+        </div>
+        <div id="m5-housing-summary" class="mini-note">집 안이 비어 있습니다.</div>
+      </div>
+    </div>
+  </section>
+
+  <section class="mobile-panel" data-mobile-panel="shop">
+    <div class="mobile-panel-card">
+      <div class="section-head">
+        <h3>상점</h3>
+        <span class="section-tip">구매 가능한 아이템</span>
+      </div>
+      <div id="m5-shop-summary" class="mobile-panel-summary">상점 정보를 불러오는 중입니다.</div>
+      <div id="m5-shop-list" class="mobile-list"></div>
+    </div>
+  </section>
+
+  <section class="mobile-panel" data-mobile-panel="log">
+    <div class="mobile-panel-card">
+      <div class="section-head">
+        <h3>기록</h3>
+        <span class="section-tip">최근 알림</span>
+      </div>
+      <div id="m5-log-summary" class="mobile-panel-summary">최근 기록을 불러오는 중입니다.</div>
+      <div id="m5-log-list" class="mobile-list"></div>
+    </div>
+  </section>
+</section>
+
+    <main class="dashboard-grid">
+      <aside class="left-panel card" id="mobile-actions-anchor">
+        <section class="quick-section">
+          <div class="section-head compact">
+            <h2>빠른 행동</h2>
+            <span class="section-tip">자주 쓰는 행동</span>
+          </div>
+          <div class="stack">
+            <button id="btn-gather">숲에서 채집하기</button>
+            <button id="btn-fish">연못에서 낚시하기</button>
+            <button id="btn-sell-all">수집품 판매하기</button>
+          </div>
+        </section>
+
+        <section class="quick-section">
+          <div class="section-head compact">
+            <h3>농사</h3>
+            <span class="section-tip">심기와 수확</span>
+          </div>
+          <div class="stack">
+            <select id="farm-seed-select"></select>
+            <div class="grid-2">
+              <button id="btn-plant-seed">씨앗 심기</button>
+              <button id="btn-farm-harvest">수확하기</button>
+            </div>
+            <div id="farm-status" class="mini-note">밭 상태를 불러오는 중입니다.</div>
+          </div>
+        </section>
+
+        <details class="utility-group">
+          <summary>시스템</summary>
+          <div class="stack top-gap">
+            <button id="btn-save">저장</button>
+            <button id="btn-load">불러오기</button>
+            <button id="btn-open-inventory">인벤토리 새로고침</button>
+            <button id="btn-reset" class="danger">새 게임</button>
+          </div>
+        </details>
+
+        <details class="utility-group">
+          <summary>설정</summary>
+          <div class="top-gap">
+            <label class="toggle">
+              <input type="checkbox" id="bgm-enabled" checked />
+              <span>시간대별 BGM 시스템 사용</span>
+            </label>
+            <div class="grid-2">
+              <button id="btn-add-coin">코인 +100</button>
+              <button id="btn-add-bling">블링 +10</button>
+            </div>
+          </div>
+        </details>
+      </aside>
+
+      <section class="center-panel" id="mobile-scene-anchor">
+        <section class="hero card">
+          <div id="scene-background-layer" class="scene-background-layer"></div>
+
+          <div class="hero-top">
+            <div class="hero-title-block">
+              <div id="time-visual-badge" class="time-visual-badge">시간대 시각 효과를 불러오는 중입니다.</div>
+              <h2 id="scene-title">마을 광장</h2>
+              <p id="time-period-text">시간대를 불러오는 중입니다.</p>
+              <p id="weather-text">오늘도 편안한 하루를 보낼 수 있을 것 같습니다.</p>
+            </div>
+
+            <div class="view-switch">
+              <button class="tab-button active" data-desktop-view="town">마을</button>
+              <button class="tab-button" data-desktop-view="farm">밭</button>
+              <button class="tab-button" data-desktop-view="home">집</button>
+            </div>
+          </div>
+
+          <div class="hero-highlight">
+            <div class="hero-highlight-main">
+              <strong id="scene-description">사람들이 천천히 오가는 평온한 마을 광장입니다.</strong>
+              <p id="scene-detail">공간 상세 정보를 불러오는 중입니다.</p>
+            </div>
+            <div class="hero-highlight-side">
+              <div class="badge-chip" id="farm-visual-status">밭 상태를 불러오는 중입니다.</div>
+              <div class="badge-chip" id="home-visual-status">집 안 정보를 불러오는 중입니다.</div>
+            </div>
+          </div>
+
+          <div id="scene-visual" class="scene-visual upgraded">
+            <article class="scene-panel large">
+              <div class="panel-head">
+                <strong>현재 공간</strong>
+                <span class="muted">메인 장면</span>
+              </div>
+              <p id="scene-spotlight-text">생활 활동을 시작하거나, 상점과 인벤토리를 둘러보기에 좋은 중심 공간입니다.</p>
+            </article>
+
+            <article class="scene-panel">
+              <div class="panel-head">
+                <strong>생활 요약</strong>
+                <span class="muted">현재 상태</span>
+              </div>
+              <p id="life-summary">생활 숙련도 정보를 불러오는 중입니다.</p>
+            </article>
+
+            <article class="scene-panel">
+              <div class="panel-head">
+                <strong>집 분위기</strong>
+                <span class="muted">하우징</span>
+              </div>
+              <div class="mini-chip-row" id="home-item-chips"></div>
+            </article>
+
+            <article class="scene-panel radio-panel">
+              <div class="panel-head">
+                <strong>라디오</strong>
+                <span class="muted">휴식 음악</span>
+              </div>
+              <p id="radio-track-title">현재 라디오: 꺼짐</p>
+              <div class="radio-controls">
+                <button id="btn-radio-play">DIVE DIVERS 재생</button>
+                <button id="btn-radio-stop">라디오 정지</button>
+              </div>
+            </article>
+          </div>
+        </section>
+
+        <details class="bottom-log card compact-log" id="log-panel">
+          <summary class="log-summary">
+            <span><strong>알림</strong> <span class="section-tip">최근 기록</span></span>
+            <span class="summary-hint">펼치기</span>
+          </summary>
+          <div id="log-list" class="log-list compact"></div>
+        </details>
+      </section>
+
+      <aside class="right-panel card" id="mobile-bag-anchor">
+        <div class="tab-row">
+          <button class="side-tab active" data-side-tab="inventory">인벤토리</button>
+          <button class="side-tab" data-side-tab="life">생활</button>
+          <button class="side-tab" data-side-tab="housing">하우징</button>
+          <button class="side-tab" data-side-tab="shop">상점</button>
+        </div>
+
+        <section class="side-panel active" data-side-panel="inventory">
+          <div class="section-head">
+            <h3>인벤토리</h3>
+            <span class="section-tip">보유 중인 아이템</span>
+          </div>
+          <div id="inventory-list" class="inventory-list compact"></div>
+        </section>
+
+        <section class="side-panel" data-side-panel="life">
+          <div class="section-head">
+            <h3>활동 기록</h3>
+            <span class="section-tip">생활 성장</span>
+          </div>
+          <div id="activity-list" class="inventory-list"></div>
+        </section>
+
+        <section class="side-panel" data-side-panel="housing">
+          <div class="section-head">
+            <h3>하우징</h3>
+            <span class="section-tip">가구 배치</span>
+          </div>
+          <div id="housing-slots" class="housing-grid"></div>
+          <div class="stack">
+            <select id="housing-item-select"></select>
+            <div class="grid-2">
+              <button id="btn-place-slot-1">1번 칸</button>
+              <button id="btn-place-slot-2">2번 칸</button>
+              <button id="btn-place-slot-3">3번 칸</button>
+              <button id="btn-place-slot-4">4번 칸</button>
+            </div>
+            <button id="btn-clear-housing">배치 초기화</button>
+          </div>
+          <div id="housing-summary" class="mini-note">집 안이 비어 있습니다.</div>
+        </section>
+
+        <section class="side-panel" data-side-panel="shop">
+          <div class="section-head">
+            <h3>상점</h3>
+            <span class="section-tip">구매 가능한 아이템</span>
+          </div>
+          <div id="shop-list" class="stack"></div>
+        </section>
+      </aside>
+    </main>
+</div>
+
+  <script type="module" src="./main.js?v=20260419a"></script>
+
+  <nav class="mobile-5panel-nav" aria-label="모바일 5패널 네비게이션">
+    <button class="mobile-5panel-button active" data-m5-panel="status">상태</button>
+    <button class="mobile-5panel-button" data-m5-panel="action">행동</button>
+    <button class="mobile-5panel-button" data-m5-panel="bag">가방</button>
+    <button class="mobile-5panel-button" data-m5-panel="shop">상점</button>
+    <button class="mobile-5panel-button" data-m5-panel="log">기록</button>
+  </nav>
+</body>
+</html>

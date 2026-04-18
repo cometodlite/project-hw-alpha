@@ -1,0 +1,156 @@
+[
+  {
+    "id": "herb",
+    "name": "허브",
+    "description": "향이 좋은 기본 채집 재료",
+    "type": "gather",
+    "sellPrice": 8,
+    "rarity": "common"
+  },
+  {
+    "id": "flower",
+    "name": "들꽃",
+    "description": "집 꾸미기나 제작에 쓸 수 있는 꽃",
+    "type": "gather",
+    "sellPrice": 10,
+    "rarity": "common"
+  },
+  {
+    "id": "wood",
+    "name": "나뭇가지",
+    "description": "간단한 생활 제작 재료",
+    "type": "gather",
+    "sellPrice": 6,
+    "rarity": "common"
+  },
+  {
+    "id": "dew_mushroom",
+    "name": "이슬 버섯",
+    "description": "아침 숲에서 드물게 발견되는 희귀 버섯",
+    "type": "gather",
+    "sellPrice": 28,
+    "rarity": "rare"
+  },
+  {
+    "id": "fish",
+    "name": "작은 물고기",
+    "description": "연못에서 쉽게 낚이는 물고기",
+    "type": "fish",
+    "sellPrice": 12,
+    "rarity": "common"
+  },
+  {
+    "id": "shrimp",
+    "name": "새우",
+    "description": "요리 재료로 사용할 수 있는 작은 새우",
+    "type": "fish",
+    "sellPrice": 15,
+    "rarity": "common"
+  },
+  {
+    "id": "silver_koi",
+    "name": "은빛 잉어",
+    "description": "드물게 낚이는 반짝이는 물고기",
+    "type": "fish",
+    "sellPrice": 36,
+    "rarity": "rare"
+  },
+  {
+    "id": "wheat",
+    "name": "밀",
+    "description": "빵이나 가공 재료로 쓰이는 곡물",
+    "type": "farm",
+    "sellPrice": 11,
+    "rarity": "common"
+  },
+  {
+    "id": "apple",
+    "name": "사과",
+    "description": "상큼한 과일",
+    "type": "farm",
+    "sellPrice": 14,
+    "rarity": "common"
+  },
+  {
+    "id": "carrot",
+    "name": "당근",
+    "description": "천천히 자라지만 수확이 안정적인 작물",
+    "type": "farm",
+    "sellPrice": 16,
+    "rarity": "common"
+  },
+  {
+    "id": "golden_apple",
+    "name": "황금 사과",
+    "description": "드물게 얻을 수 있는 특별한 수확물",
+    "type": "farm",
+    "sellPrice": 48,
+    "rarity": "rare"
+  },
+  {
+    "id": "carrot_seed",
+    "name": "당근 씨앗",
+    "description": "당근을 키울 수 있는 씨앗",
+    "type": "seed",
+    "sellPrice": 0,
+    "growthSeconds": 20,
+    "harvestItemId": "carrot",
+    "harvestMin": 2,
+    "harvestMax": 4
+  },
+  {
+    "id": "wheat_seed",
+    "name": "밀 씨앗",
+    "description": "밀을 키울 수 있는 씨앗",
+    "type": "seed",
+    "sellPrice": 0,
+    "growthSeconds": 15,
+    "harvestItemId": "wheat",
+    "harvestMin": 2,
+    "harvestMax": 3
+  },
+  {
+    "id": "apple_seed",
+    "name": "사과 묘목",
+    "description": "시간은 조금 걸리지만 가치 있는 작물을 얻을 수 있다",
+    "type": "seed",
+    "sellPrice": 0,
+    "growthSeconds": 30,
+    "harvestItemId": "apple",
+    "harvestMin": 1,
+    "harvestMax": 2
+  },
+  {
+    "id": "golden_seed",
+    "name": "황금 씨앗",
+    "description": "숙련된 농부만 다룰 수 있는 특별한 씨앗",
+    "type": "seed",
+    "sellPrice": 0,
+    "growthSeconds": 36,
+    "harvestItemId": "apple",
+    "harvestMin": 2,
+    "harvestMax": 3,
+    "bonusHarvestItemId": "golden_apple"
+  },
+  {
+    "id": "tea-set",
+    "name": "티 세트",
+    "description": "집 안 분위기를 따뜻하게 만들어 주는 가구",
+    "type": "housing",
+    "sellPrice": 0
+  },
+  {
+    "id": "soft-lamp",
+    "name": "포근한 램프",
+    "description": "은은한 빛을 내는 장식용 조명",
+    "type": "housing",
+    "sellPrice": 0
+  },
+  {
+    "id": "sunrise-curtain",
+    "name": "일출 커튼",
+    "description": "아침 분위기를 닮은 커튼",
+    "type": "housing",
+    "sellPrice": 0
+  }
+]

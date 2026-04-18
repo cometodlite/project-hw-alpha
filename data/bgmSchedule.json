@@ -1,0 +1,74 @@
+[
+  {
+    "id": "late-night",
+    "startHour": 0,
+    "endHour": 4,
+    "label": "고요한 별빛",
+    "title": "고요한 별빛",
+    "description": "세상이 조용해지는 깊은 밤입니다.",
+    "file": null
+  },
+  {
+    "id": "morning-start",
+    "startHour": 5,
+    "endHour": 6,
+    "label": "아침의 시작",
+    "title": "아침의 시작",
+    "description": "부드럽게 하루가 깨어나는 시간입니다.",
+    "file": null
+  },
+  {
+    "id": "sunrise",
+    "startHour": 7,
+    "endHour": 8,
+    "label": "아름다운 일출",
+    "title": "아름다운 일출",
+    "description": "햇살이 마을을 비추기 시작합니다.",
+    "file": null
+  },
+  {
+    "id": "daylight",
+    "startHour": 9,
+    "endHour": 11,
+    "label": "맑은 하루",
+    "title": "맑은 하루",
+    "description": "생활 활동을 시작하기 좋은 시간입니다.",
+    "file": null
+  },
+  {
+    "id": "afternoon",
+    "startHour": 12,
+    "endHour": 16,
+    "label": "햇살 아래 산책",
+    "title": "햇살 아래 산책",
+    "description": "평온하고 따뜻한 오후가 이어집니다.",
+    "file": null
+  },
+  {
+    "id": "sunset",
+    "startHour": 17,
+    "endHour": 18,
+    "label": "노을빛 거리",
+    "title": "노을빛 거리",
+    "description": "하늘이 천천히 주황빛으로 물들고 있습니다.",
+    "file": null
+  },
+  {
+    "id": "evening",
+    "startHour": 19,
+    "endHour": 21,
+    "label": "따뜻한 저녁",
+    "title": "따뜻한 저녁",
+    "description": "오늘의 하루를 차분히 정리하는 시간입니다.",
+    "file": null
+  },
+  {
+    "id": "night",
+    "startHour": 22,
+    "endHour": 23,
+    "label": "조용한 밤",
+    "title": "조용한 밤",
+    "description": "편안한 휴식이 어울리는 밤입니다.",
+    "file": null
+  }
+]

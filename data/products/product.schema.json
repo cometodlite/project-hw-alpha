@@ -1,0 +1,151 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://project-hw.local/schemas/product.schema.json",
+  "title": "PROJECT: HW Product",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "productId",
+    "name",
+    "type",
+    "description",
+    "price",
+    "currency",
+    "rewardData",
+    "isRepeatable",
+    "saleStartAt",
+    "saleEndAt",
+    "isActive",
+    "tags"
+  ],
+  "properties": {
+    "productId": {
+      "type": "string",
+      "pattern": "^[a-z0-9][a-z0-9_-]*$"
+    },
+    "name": {
+      "type": "string",
+      "minLength": 1
+    },
+    "type": {
+      "type": "string",
+      "enum": [
+        "bling_pack",
+        "direct_pack",
+        "furniture_pack",
+        "season_pack",
+        "support_pack"
+      ]
+    },
+    "description": {
+      "type": "string"
+    },
+    "price": {
+      "type": "number",
+      "minimum": 0
+    },
+    "currency": {
+      "type": "string",
+      "enum": [
+        "KRW",
+        "USD",
+        "paidBling",
+        "freeBling",
+        "bling"
+      ]
+    },
+    "rewardData": {
+      "$ref": "#/$defs/rewardData"
+    },
+    "isRepeatable": {
+      "type": "boolean"
+    },
+    "saleStartAt": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "format": "date-time"
+    },
+    "saleEndAt": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "format": "date-time"
+    },
+    "isActive": {
+      "type": "boolean"
+    },
+    "tags": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    }
+  },
+  "$defs": {
+    "rewardData": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "coin": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "freeBling": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "paidBling": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "items": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "itemId",
+              "amount"
+            ],
+            "properties": {
+              "itemId": {
+                "type": "string"
+              },
+              "amount": {
+                "type": "integer",
+                "minimum": 1
+              }
+            }
+          }
+        },
+        "entitlements": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "entitlementType",
+              "entitlementKey"
+            ],
+            "properties": {
+              "entitlementType": {
+                "type": "string",
+                "enum": [
+                  "furniture_pack",
+                  "season_pack",
+                  "support_pack"
+                ]
+              },
+              "entitlementKey": {
+                "type": "string"
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
