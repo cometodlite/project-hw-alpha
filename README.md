@@ -441,4 +441,4 @@ GitHub Pages 배포본은 정적 파일만 구동합니다. 별도 API 서버를
   - 배포 확인용 캐시 버전 기준을 `20260419a`로 갱신
   - 로컬 서버 테스트 기본 origin을 `http://127.0.0.1:8787`로 정리
 - 남은 문제
-  - GitHub CLI 인증 후 원격 저장소 생성, push, Pages 활성화 필요
+  - GitHub Pages 실제 URL에서 모바일 / iPad / 데스크톱 실기기 확인 필요
