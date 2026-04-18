@@ -147,6 +147,14 @@ h1 { margin: 0; font-size: clamp(2rem, 4vw, 3.2rem); }
   box-shadow: none;
 }
 
+.auth-actions .firebase-only {
+  display: none;
+}
+
+.auth-panel.auth-firebase .auth-actions .firebase-only {
+  display: block;
+}
+
 button.secondary {
   background: rgba(255,255,255,0.88);
   color: var(--text);

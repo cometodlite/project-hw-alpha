@@ -1,5 +1,5 @@
 import { state, DEFAULT_PLAYER_STATE, addLog, syncUnlocks } from "./state.js";
-import { loadServerPlayerState, saveServerPlayerState } from "./api.js";
+import { getBackendLabel, loadServerPlayerState, saveServerPlayerState } from "./api.js";
 
 const SAVE_KEY = "project-hw-save-v4";
 
@@ -7,7 +7,7 @@ export async function saveGame() {
   localStorage.setItem(SAVE_KEY, JSON.stringify(state.player));
   try {
     const savedToServer = await saveServerPlayerState();
-    addLog(savedToServer ? "서버 저장이 완료되었습니다." : "저장이 완료되었습니다.");
+    addLog(savedToServer ? `${getBackendLabel()} 저장이 완료되었습니다.` : "저장이 완료되었습니다.");
   } catch (error) {
     console.warn(error);
     addLog("서버 저장에 실패해 로컬에 저장했습니다.");
@@ -19,7 +19,7 @@ export async function loadGame() {
     const loadedFromServer = await loadServerPlayerState();
     if (loadedFromServer) {
       syncUnlocks();
-      addLog("서버 저장 데이터를 불러왔습니다.");
+      addLog(`${getBackendLabel()} 저장 데이터를 불러왔습니다.`);
       return;
     }
   } catch (error) {

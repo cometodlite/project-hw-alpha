@@ -38,7 +38,9 @@ npm run dev
 localStorage.setItem("project-hw-api-base", "https://your-api.example.com");
 ```
 
-GitHub Pages 배포본은 정적 파일만 구동합니다. 별도 API 서버를 연결하기 전까지 계정 / Mock 결제 기능은 첫 화면에서 강조하지 않고, 생활 루프와 저장 / 불러오기는 브라우저 로컬 저장으로 동작합니다.
+GitHub Pages 배포본은 정적 파일만 구동합니다. `firebase-config.js`에 Firebase 웹 앱 설정값을 넣으면 이메일 회원가입 / 로그인 / Google 로그인을 사용할 수 있습니다. Firebase 설정값이 비어 있거나 실패하면 생활 루프와 저장 / 불러오기는 브라우저 로컬 저장으로 동작합니다.
+
+Firebase 설정 절차와 Firestore 저장 구조는 `docs/firebase-auth-setup.md`에 정리되어 있습니다.
 
 ## 다음 확장 추천
 - 실제 오디오 파일 연결
@@ -452,3 +454,15 @@ GitHub Pages 배포본은 정적 파일만 구동합니다. 별도 API 서버를
   - 배포 확인용 캐시 버전 기준을 `20260419b`로 갱신
 - 남은 문제
   - GitHub Pages 실제 URL에서 iPhone 세로, iPad 세로, iPad 가로 가독성 재확인 필요
+
+## 2026-04-19d Firebase Auth 1차 연결
+- 수정 목적: GitHub Pages에서 이메일 회원가입 / 로그인 / Google 로그인을 사용할 수 있는 Firebase Auth 경로 추가
+- 수정 파일: `firebase-config.js`, `js/firebase.js`, `js/api.js`, `js/ui.js`, `js/save.js`, `index.html`, `style.css`, `README.md`, `DEPLOY_NOTE.txt`, `docs/firebase-auth-setup.md`
+- 해결한 문제
+  - Firebase 설정값이 있으면 Pages에서도 계정 UI가 활성화되도록 인증 경로 추가
+  - 로그인 사용자의 진행 데이터를 Firestore `player_states/{uid}`에 저장 / 불러오기
+  - Firebase 설정값이 없으면 기존 로컬 저장 플레이를 유지
+  - 배포 확인용 캐시 버전 기준을 `20260419c`로 갱신
+- 남은 문제
+  - 실제 Firebase 프로젝트 값 입력 후 GitHub Pages에서 이메일 로그인 / Google 로그인 실사용 확인 필요
+  - 결제, 유료 블링 지급, ledger는 Cloud Functions 또는 별도 서버 권한 코드로 분리 필요

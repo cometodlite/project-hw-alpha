@@ -14,10 +14,13 @@ import { saveGame, loadGame, resetGame } from "./save.js";
 import { playRadio, stopRadio, getRadioState } from "./audio.js";
 import {
   applyServerSnapshot,
+  getBackendLabel,
+  getBackendMode,
   getApiBase,
   getAuthState,
   isApiEnabled,
   loginAccount,
+  loginWithGoogleAccount,
   logoutAccount,
   registerAccount
 } from "./api.js";
@@ -402,6 +405,7 @@ export function initUI() {
   el.authDisplayName = document.getElementById("auth-display-name");
   el.authRegisterButton = document.getElementById("btn-auth-register");
   el.authLoginButton = document.getElementById("btn-auth-login");
+  el.authGoogleButton = document.getElementById("btn-auth-google");
   el.authLogoutButton = document.getElementById("btn-auth-logout");
   el.authLoadServerButton = document.getElementById("btn-auth-load-server");
   el.timePeriodText = document.getElementById("time-period-text");
@@ -582,6 +586,8 @@ function setAuthState(auth) {
 function setServerMode(mode, message) {
   state.ui.server = {
     apiBase: getApiBase(),
+    backendMode: getBackendMode(),
+    backendLabel: getBackendLabel(),
     mode,
     message
   };
@@ -600,33 +606,37 @@ function renderAuthPanel() {
   const auth = state.ui.auth;
   const server = state.ui.server;
   const authenticated = auth.status === "authenticated";
+  const backendMode = getBackendMode();
+  const backendLabel = getBackendLabel();
   const apiBase = server.apiBase || getApiBase();
-  const apiMissing = !apiBase;
-  const apiOffline = Boolean(apiBase) && server.mode === "offline" && !authenticated;
+  const apiMissing = backendMode === "local";
+  const apiOffline = backendMode !== "local" && server.mode === "offline" && !authenticated;
 
   el.authStateText.textContent = authenticated
     ? `${auth.displayName || auth.email || "로그인됨"}`
     : "게스트";
   el.authServerText.textContent = authenticated
-    ? `서버 저장 사용 중 · ${apiBase || "API 미설정"}`
-    : (apiMissing ? "로컬 저장으로 플레이 중" : (server.message || "로그인하면 서버 저장"));
+    ? `${backendLabel} 저장 사용 중${backendMode === "api" ? ` · ${apiBase}` : ""}`
+    : (apiMissing ? "로컬 저장으로 플레이 중" : (server.message || `${backendLabel} 로그인 가능`));
 
   el.authPanel?.classList.toggle("auth-local-only", apiMissing);
   el.authPanel?.classList.toggle("auth-offline", apiOffline);
-  el.authPanel?.classList.toggle("auth-full", Boolean(apiBase) && !apiOffline);
+  el.authPanel?.classList.toggle("auth-full", backendMode !== "local" && !apiOffline);
+  el.authPanel?.classList.toggle("auth-firebase", backendMode === "firebase");
   el.authForm?.classList.toggle("is-authenticated", authenticated);
-  const canUseAuth = Boolean(apiBase) && !apiOffline && !authBusy;
+  const canUseAuth = backendMode !== "local" && !apiOffline && !authBusy;
   [el.authEmail, el.authPassword, el.authDisplayName].forEach((input) => {
     if (input) input.disabled = authBusy;
   });
   if (el.authRegisterButton) el.authRegisterButton.disabled = !canUseAuth || authenticated;
   if (el.authLoginButton) el.authLoginButton.disabled = !canUseAuth || authenticated;
+  if (el.authGoogleButton) el.authGoogleButton.disabled = backendMode !== "firebase" || !canUseAuth || authenticated;
   if (el.authLogoutButton) el.authLogoutButton.disabled = !canUseAuth || !authenticated;
   if (el.authLoadServerButton) el.authLoadServerButton.disabled = !canUseAuth || !authenticated;
 }
 
 export async function refreshAuthState() {
-  setServerMode(isApiEnabled() ? "checking" : "local", isApiEnabled() ? "서버 확인 중" : "로컬 저장");
+  setServerMode(isApiEnabled() ? "checking" : "local", isApiEnabled() ? `${getBackendLabel()} 확인 중` : "로컬 저장");
   renderAuthPanel();
   if (!isApiEnabled()) {
     setAuthState({ status: "guest" });
@@ -637,7 +647,7 @@ export async function refreshAuthState() {
   try {
     const auth = await getAuthState();
     setAuthState(auth);
-    setServerMode(auth.status === "authenticated" ? "server" : "guest", auth.status === "authenticated" ? "서버 저장 사용 중" : "로그인하면 서버 저장");
+    setServerMode(auth.status === "authenticated" ? "server" : "guest", auth.status === "authenticated" ? `${getBackendLabel()} 저장 사용 중` : `${getBackendLabel()} 로그인 가능`);
   } catch (error) {
     console.warn(error);
     setAuthState({ status: "guest" });
@@ -648,7 +658,7 @@ export async function refreshAuthState() {
 
 async function finishAuth(data, message) {
   setAuthState(data.auth);
-  setServerMode("server", "서버 저장 사용 중");
+  setServerMode("server", `${getBackendLabel()} 저장 사용 중`);
   applyServerSnapshot(data);
   syncUnlocks();
   await syncServerProducts();
@@ -680,7 +690,7 @@ async function submitAuth(mode) {
       try {
         data = await registerAccount(values);
       } catch (error) {
-        if (error.status !== 409) throw error;
+        if (error.status !== 409 && error.code !== "auth/email-already-in-use") throw error;
         data = await loginAccount(values);
       }
       await finishAuth(data, "계정 연결이 완료되었습니다.");
@@ -690,7 +700,25 @@ async function submitAuth(mode) {
     }
   } catch (error) {
     console.warn(error);
-    addLog(error.status === 401 ? "이메일 또는 비밀번호를 확인해 주세요." : "계정 연결에 실패했습니다. 서버 상태를 확인해 주세요.");
+    const credentialError = error.status === 401 || ["auth/invalid-credential", "auth/user-not-found", "auth/wrong-password"].includes(error.code);
+    addLog(credentialError ? "이메일 또는 비밀번호를 확인해 주세요." : "계정 연결에 실패했습니다. Firebase 설정 또는 서버 상태를 확인해 주세요.");
+    renderAll();
+  } finally {
+    authBusy = false;
+    await refreshAuthState();
+  }
+}
+
+async function handleGoogleLogin() {
+  if (authBusy) return;
+  authBusy = true;
+  renderAuthPanel();
+  try {
+    const data = await loginWithGoogleAccount();
+    await finishAuth(data, "Google 로그인했습니다.");
+  } catch (error) {
+    console.warn(error);
+    addLog("Google 로그인에 실패했습니다. Firebase 설정과 팝업 허용 상태를 확인해 주세요.");
     renderAll();
   } finally {
     authBusy = false;
@@ -705,7 +733,7 @@ async function handleLogout() {
   try {
     await logoutAccount();
     setAuthState({ status: "guest" });
-    setServerMode("guest", "로그인하면 서버 저장");
+    setServerMode("guest", `${getBackendLabel()} 로그인 가능`);
     addLog("로그아웃했습니다. 현재 화면은 로컬 상태로 유지됩니다.");
     renderAll();
   } catch (error) {
@@ -721,7 +749,7 @@ async function handleLogout() {
 async function handleLoadServerState() {
   if (authBusy) return;
   if (state.ui.auth.status !== "authenticated") {
-    addLog("로그인 후 서버 저장 데이터를 불러올 수 있습니다.");
+    addLog(`로그인 후 ${getBackendLabel()} 저장 데이터를 불러올 수 있습니다.`);
     renderAll();
     return;
   }
@@ -732,11 +760,11 @@ async function handleLoadServerState() {
     await syncServerProducts();
     populateSeedSelect();
     refreshHousingUI();
-    addLog("서버 저장 데이터를 다시 동기화했습니다.");
+    addLog(`${getBackendLabel()} 저장 데이터를 다시 동기화했습니다.`);
     renderAll();
   } catch (error) {
     console.warn(error);
-    addLog("서버 저장 데이터를 불러오지 못했습니다.");
+    addLog(`${getBackendLabel()} 저장 데이터를 불러오지 못했습니다.`);
     renderAll();
   } finally {
     authBusy = false;
@@ -751,6 +779,7 @@ export function bindUIEvents() {
   });
   el.authRegisterButton?.addEventListener("click", () => submitAuth("register"));
   el.authLoginButton?.addEventListener("click", () => submitAuth("login"));
+  el.authGoogleButton?.addEventListener("click", handleGoogleLogin);
   el.authLogoutButton?.addEventListener("click", handleLogout);
   el.authLoadServerButton?.addEventListener("click", handleLoadServerState);
   refreshAuthState();

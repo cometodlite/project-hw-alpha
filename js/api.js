@@ -1,4 +1,15 @@
 import { state } from "./state.js";
+import {
+  getFirebaseAuthState,
+  isFirebaseConfigured,
+  loadFirebasePlayerState,
+  loginFirebaseAccount,
+  loginFirebaseWithGoogle,
+  logoutFirebaseAccount,
+  registerFirebaseAccount,
+  restoreFirebaseState,
+  saveFirebasePlayerState
+} from "./firebase.js";
 
 const API_BASE_KEY = "project-hw-api-base";
 
@@ -27,7 +38,24 @@ export function setApiBase(apiBase) {
 }
 
 export function isApiEnabled() {
+  return isFirebaseConfigured() || Boolean(getApiBase());
+}
+
+export function isNodeApiEnabled() {
   return Boolean(getApiBase());
+}
+
+export function getBackendMode() {
+  if (isFirebaseConfigured()) return "firebase";
+  if (getApiBase()) return "api";
+  return "local";
+}
+
+export function getBackendLabel() {
+  const mode = getBackendMode();
+  if (mode === "firebase") return "Firebase";
+  if (mode === "api") return "서버";
+  return "로컬";
 }
 
 async function apiFetch(path, options = {}) {
@@ -51,12 +79,16 @@ async function apiFetch(path, options = {}) {
 }
 
 export async function getAuthState() {
-  if (!isApiEnabled()) return { status: "guest" };
+  if (isFirebaseConfigured()) return getFirebaseAuthState();
+  if (!isNodeApiEnabled()) return { status: "guest" };
   const data = await apiFetch("/auth/me");
   return data.auth || { status: "guest" };
 }
 
 export async function registerAccount({ email, password, displayName }) {
+  if (isFirebaseConfigured()) {
+    return registerFirebaseAccount({ email, password, displayName });
+  }
   return apiFetch("/auth/register", {
     method: "POST",
     body: JSON.stringify({ email, password, displayName })
@@ -64,13 +96,26 @@ export async function registerAccount({ email, password, displayName }) {
 }
 
 export async function loginAccount({ email, password }) {
+  if (isFirebaseConfigured()) {
+    return loginFirebaseAccount({ email, password });
+  }
   return apiFetch("/auth/login", {
     method: "POST",
     body: JSON.stringify({ email, password })
   });
 }
 
+export async function loginWithGoogleAccount() {
+  if (!isFirebaseConfigured()) {
+    throw new Error("Google login requires Firebase");
+  }
+  return loginFirebaseWithGoogle();
+}
+
 export async function logoutAccount() {
+  if (isFirebaseConfigured()) {
+    return logoutFirebaseAccount();
+  }
   return apiFetch("/auth/logout", {
     method: "POST",
     body: "{}"
@@ -113,7 +158,11 @@ export function buildServerSavePayload() {
 }
 
 export async function loadServerPlayerState() {
-  if (!isApiEnabled()) return false;
+  if (isFirebaseConfigured()) {
+    const snapshot = await loadFirebasePlayerState();
+    return snapshot ? applyServerSnapshot(snapshot) : false;
+  }
+  if (!isNodeApiEnabled()) return false;
   const auth = await getAuthState();
   if (auth.status !== "authenticated") return false;
   const snapshot = await apiFetch("/me/player-state");
@@ -121,7 +170,11 @@ export async function loadServerPlayerState() {
 }
 
 export async function saveServerPlayerState() {
-  if (!isApiEnabled()) return false;
+  if (isFirebaseConfigured()) {
+    const snapshot = await saveFirebasePlayerState();
+    return snapshot ? applyServerSnapshot(snapshot) : false;
+  }
+  if (!isNodeApiEnabled()) return false;
   const auth = await getAuthState();
   if (auth.status !== "authenticated") return false;
   const snapshot = await apiFetch("/me/player-state", {
@@ -132,13 +185,17 @@ export async function saveServerPlayerState() {
 }
 
 export async function restoreServerState() {
-  if (!isApiEnabled()) return false;
+  if (isFirebaseConfigured()) {
+    const snapshot = await restoreFirebaseState();
+    return snapshot ? applyServerSnapshot(snapshot) : false;
+  }
+  if (!isNodeApiEnabled()) return false;
   const snapshot = await apiFetch("/me/restore", { method: "POST", body: "{}" });
   return applyServerSnapshot(snapshot);
 }
 
 export async function listServerProducts() {
-  if (!isApiEnabled()) return [];
+  if (!isNodeApiEnabled()) return [];
   const data = await apiFetch("/products");
   return data.products || [];
 }

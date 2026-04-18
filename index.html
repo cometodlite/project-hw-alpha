@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>PROJECT: HW</title>
   <link rel="icon" href="data:," />
-  <link rel="stylesheet" href="./style.css?v=20260419b" />
+  <link rel="stylesheet" href="./style.css?v=20260419c" />
 </head>
 <body>
   <div id="app">
@@ -64,8 +64,9 @@
         <div class="auth-actions">
           <button id="btn-auth-register" type="button">회원가입</button>
           <button id="btn-auth-login" type="button">로그인</button>
+          <button id="btn-auth-google" type="button" class="firebase-only">Google 로그인</button>
           <button id="btn-auth-logout" type="button" class="secondary">로그아웃</button>
-          <button id="btn-auth-load-server" type="button" class="secondary">서버 불러오기</button>
+          <button id="btn-auth-load-server" type="button" class="secondary">클라우드 불러오기</button>
         </div>
       </form>
     </section>
@@ -403,7 +404,8 @@
     </main>
 </div>
 
-  <script type="module" src="./main.js?v=20260419b"></script>
+  <script src="./firebase-config.js?v=20260419c"></script>
+  <script type="module" src="./main.js?v=20260419c"></script>
 
   <nav class="mobile-5panel-nav" aria-label="모바일 5패널 네비게이션">
     <button class="mobile-5panel-button active" data-m5-panel="status">상태</button>
