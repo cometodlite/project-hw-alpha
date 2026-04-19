@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>PROJECT: HW</title>
   <link rel="icon" href="data:," />
-  <link rel="stylesheet" href="./style.css?v=20260419d" />
+  <link rel="stylesheet" href="./style.css?v=20260419e" />
 </head>
 <body>
   <div id="app">
@@ -16,27 +16,40 @@
         <p class="subtitle">단일 화면 대시보드형 힐링 생활형 RPG 프로토타입</p>
       </div>
 
-      <div class="status-grid">
-        <div class="status-card">
-          <span class="label">현재 시간</span>
-          <strong id="current-time">--:--</strong>
+      <div class="topbar-side">
+        <div class="status-grid">
+          <div class="status-card">
+            <span class="label">현재 시간</span>
+            <strong id="current-time">--:--</strong>
+          </div>
+          <div class="status-card">
+            <span class="label">코인</span>
+            <strong id="coin-value">0</strong>
+          </div>
+          <div class="status-card">
+            <span class="label">블링</span>
+            <strong id="bling-value">0</strong>
+          </div>
+          <div class="status-card">
+            <span class="label">현재 BGM</span>
+            <strong id="bgm-title">없음</strong>
+          </div>
         </div>
-        <div class="status-card">
-          <span class="label">코인</span>
-          <strong id="coin-value">0</strong>
-        </div>
-        <div class="status-card">
-          <span class="label">블링</span>
-          <strong id="bling-value">0</strong>
-        </div>
-        <div class="status-card">
-          <span class="label">현재 BGM</span>
-          <strong id="bgm-title">없음</strong>
+        <div class="auth-dock" id="desktop-auth-dock">
+          <button id="btn-auth-toggle" class="auth-toggle" type="button" aria-expanded="false" aria-controls="auth-panel">
+            <span id="auth-toggle-label">계정</span>
+            <small id="auth-toggle-detail">로컬 저장</small>
+          </button>
+          <div id="desktop-auth-slot"></div>
         </div>
       </div>
     </header>
 
-    <section class="auth-panel card auth-local-only" aria-label="계정 연결">
+    <section id="auth-panel" class="auth-panel card auth-local-only auth-popover auth-collapsed" aria-label="계정 연결">
+      <div class="auth-panel-head">
+        <strong>계정 연결</strong>
+        <button id="btn-auth-close" type="button" class="secondary">닫기</button>
+      </div>
       <div class="auth-status-row">
         <div>
           <span class="label">계정 상태</span>
@@ -117,6 +130,14 @@
         <button class="tab-button" data-m5-view="farm">밭</button>
         <button class="tab-button" data-m5-view="home">집</button>
       </div>
+      <div class="mobile-auth-strip">
+        <div>
+          <strong id="m5-auth-title">계정</strong>
+          <small id="m5-auth-detail">로컬 저장으로 플레이 중</small>
+        </div>
+        <button id="m5-auth-toggle" type="button" aria-expanded="false" aria-controls="auth-panel">계정 연결</button>
+      </div>
+      <div id="mobile-auth-slot"></div>
     </div>
   </section>
 
@@ -404,8 +425,8 @@
     </main>
 </div>
 
-  <script src="./firebase-config.js?v=20260419d"></script>
-  <script type="module" src="./main.js?v=20260419d"></script>
+  <script src="./firebase-config.js?v=20260419e"></script>
+  <script type="module" src="./main.js?v=20260419e"></script>
 
   <nav class="mobile-5panel-nav" aria-label="모바일 5패널 네비게이션">
     <button class="mobile-5panel-button active" data-m5-panel="status">상태</button>

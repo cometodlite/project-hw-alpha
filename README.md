@@ -478,3 +478,14 @@ Firebase 설정 절차와 Firestore 저장 구조는 `docs/firebase-auth-setup.m
   - Firebase Console에서 Email/Password, Google 제공자 활성화 확인 필요
   - Authorized domains에 `cometodlite.github.io` 등록 확인 필요
   - Firestore Database 생성 및 Security Rules 적용 필요
+
+## 2026-04-19f 계정 UI 위치 정리
+- 수정 목적: 로그인 / 회원가입 폼이 첫 게임 화면을 밀어내지 않도록 계정 진입점을 축소
+- 수정 파일: `index.html`, `style.css`, `main.js`, `js/ui.js`, `README.md`, `DEPLOY_NOTE.txt`
+- 해결한 문제
+  - 데스크톱 계정 UI를 우상단 작은 계정 버튼과 팝오버로 이동
+  - 모바일 STATUS 패널 하단에 계정 상태와 계정 연결 버튼 배치
+  - 계정 패널 닫기, 바깥 클릭, Escape 닫기 처리 추가
+  - 배포 확인용 캐시 버전 기준을 `20260419e`로 갱신
+- 남은 문제
+  - GitHub Pages 실제 화면에서 이메일 / Google 로그인 후 Firestore 저장 생성 확인 필요

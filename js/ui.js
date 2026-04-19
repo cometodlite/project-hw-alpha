@@ -41,6 +41,9 @@ let authBusy = false;
 
 const MOBILE_PANELS = new Set(["status", "action", "bag", "shop", "log"]);
 const MOBILE_BAG_TABS = new Set(["inventory", "housing"]);
+const MOBILE_AUTH_QUERY = "(max-width: 760px), (min-width: 761px) and (max-width: 1024px) and (orientation: portrait) and (pointer: coarse)";
+
+let authPanelOpen = false;
 
 const SCENE_META = {
   town: {
@@ -396,7 +399,16 @@ export function initUI() {
   el.coinValue = document.getElementById("coin-value");
   el.blingValue = document.getElementById("bling-value");
   el.bgmTitle = document.getElementById("bgm-title");
-  el.authPanel = document.querySelector(".auth-panel");
+  el.authPanel = document.getElementById("auth-panel");
+  el.desktopAuthSlot = document.getElementById("desktop-auth-slot");
+  el.mobileAuthSlot = document.getElementById("mobile-auth-slot");
+  el.authToggleButton = document.getElementById("btn-auth-toggle");
+  el.authToggleLabel = document.getElementById("auth-toggle-label");
+  el.authToggleDetail = document.getElementById("auth-toggle-detail");
+  el.authCloseButton = document.getElementById("btn-auth-close");
+  el.m5AuthToggleButton = document.getElementById("m5-auth-toggle");
+  el.m5AuthTitle = document.getElementById("m5-auth-title");
+  el.m5AuthDetail = document.getElementById("m5-auth-detail");
   el.authStateText = document.getElementById("auth-state-text");
   el.authServerText = document.getElementById("auth-server-text");
   el.authForm = document.getElementById("auth-form");
@@ -463,6 +475,7 @@ export function initUI() {
   if (el.logPanel) el.logPanel.open = false;
   activePanel = "status";
   activeBagTab = "inventory";
+  syncAuthPanelPlacement();
   renderAllM5Panels();
   applyMobilePanel();
   applyMobileBagTab();
@@ -601,6 +614,24 @@ function getAuthFormValues() {
   };
 }
 
+function isMobileAuthLayout() {
+  return Boolean(globalThis.matchMedia?.(MOBILE_AUTH_QUERY).matches);
+}
+
+function syncAuthPanelPlacement() {
+  if (!el.authPanel) return;
+  const target = isMobileAuthLayout() ? el.mobileAuthSlot : el.desktopAuthSlot;
+  if (target && el.authPanel.parentElement !== target) {
+    target.appendChild(el.authPanel);
+  }
+}
+
+function setAuthPanelOpen(open) {
+  authPanelOpen = Boolean(open);
+  syncAuthPanelPlacement();
+  renderAuthPanel();
+}
+
 function renderAuthPanel() {
   if (!el.authStateText || !el.authServerText) return;
   const auth = state.ui.auth;
@@ -623,7 +654,20 @@ function renderAuthPanel() {
   el.authPanel?.classList.toggle("auth-offline", apiOffline);
   el.authPanel?.classList.toggle("auth-full", backendMode !== "local" && !apiOffline);
   el.authPanel?.classList.toggle("auth-firebase", backendMode === "firebase");
+  el.authPanel?.classList.toggle("auth-collapsed", !authPanelOpen);
+  el.authPanel?.classList.toggle("auth-open", authPanelOpen);
   el.authForm?.classList.toggle("is-authenticated", authenticated);
+  if (el.authToggleButton) el.authToggleButton.setAttribute("aria-expanded", String(authPanelOpen));
+  if (el.m5AuthToggleButton) el.m5AuthToggleButton.setAttribute("aria-expanded", String(authPanelOpen));
+  const buttonLabel = authenticated ? "로그인됨" : (backendMode === "local" ? "로컬 저장" : "계정");
+  const buttonDetail = authenticated
+    ? `${backendLabel} 저장 사용 중`
+    : (apiOffline ? "연결 실패 · 로컬 저장" : (apiMissing ? "로컬 저장으로 플레이 중" : `${backendLabel} 로그인 가능`));
+  if (el.authToggleLabel) el.authToggleLabel.textContent = buttonLabel;
+  if (el.authToggleDetail) el.authToggleDetail.textContent = buttonDetail;
+  if (el.m5AuthTitle) el.m5AuthTitle.textContent = buttonLabel;
+  if (el.m5AuthDetail) el.m5AuthDetail.textContent = buttonDetail;
+  if (el.m5AuthToggleButton) el.m5AuthToggleButton.textContent = authPanelOpen ? "닫기" : (authenticated ? "계정 보기" : "계정 연결");
   const canUseAuth = backendMode !== "local" && !apiOffline && !authBusy;
   [el.authEmail, el.authPassword, el.authDisplayName].forEach((input) => {
     if (input) input.disabled = authBusy;
@@ -782,6 +826,24 @@ export function bindUIEvents() {
   el.authGoogleButton?.addEventListener("click", handleGoogleLogin);
   el.authLogoutButton?.addEventListener("click", handleLogout);
   el.authLoadServerButton?.addEventListener("click", handleLoadServerState);
+  el.authToggleButton?.addEventListener("click", () => setAuthPanelOpen(!authPanelOpen));
+  el.m5AuthToggleButton?.addEventListener("click", () => setAuthPanelOpen(!authPanelOpen));
+  el.authCloseButton?.addEventListener("click", () => setAuthPanelOpen(false));
+  globalThis.addEventListener?.("resize", () => {
+    syncAuthPanelPlacement();
+    renderAuthPanel();
+  });
+  document.addEventListener("click", (event) => {
+    if (!authPanelOpen) return;
+    const target = event.target;
+    if (el.authPanel?.contains(target)) return;
+    if (el.authToggleButton?.contains(target)) return;
+    if (el.m5AuthToggleButton?.contains(target)) return;
+    setAuthPanelOpen(false);
+  });
+  document.addEventListener("keydown", (event) => {
+    if (event.key === "Escape") setAuthPanelOpen(false);
+  });
   refreshAuthState();
 
   document.querySelectorAll(".mobile-5panel-button").forEach((button) => {
