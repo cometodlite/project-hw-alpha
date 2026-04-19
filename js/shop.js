@@ -1,6 +1,6 @@
 import { state, addLog } from "./state.js";
 import { renderAll } from "./ui.js";
-import { checkoutServerProduct, completeMockPurchase, getAuthState, listServerProducts, restoreServerState } from "./api.js";
+import { checkoutServerProduct, completeMockPurchase, getAuthState, isNodeApiEnabled, listServerProducts, restoreServerState } from "./api.js";
 
 function isVisibleInShop(item) {
   if (item.id === "apple_seed") return state.player.unlocks.appleSeedUnlocked;
@@ -38,9 +38,10 @@ export function renderShop(container) {
 
   if (state.data.products?.length) {
     const authenticated = state.ui.auth.status === "authenticated";
+    const canCheckout = authenticated && isNodeApiEnabled();
     const header = document.createElement("div");
     header.className = "mini-note";
-    header.textContent = "웹 결제 상품";
+    header.textContent = canCheckout ? "웹 결제 상품" : "웹 결제 상품 · 결제 서버 준비 중";
     container.appendChild(header);
 
     for (const product of state.data.products) {
@@ -52,7 +53,7 @@ export function renderShop(container) {
           <div>${product.description}</div>
           <small>${product.currency} ${product.price.toLocaleString("ko-KR")} · ${product.type}</small>
         </div>
-        <button data-product-id="${product.productId}" ${authenticated ? "" : "disabled"}>${authenticated ? "Mock 결제" : "로그인 필요"}</button>
+        <button data-product-id="${product.productId}" ${canCheckout ? "" : "disabled"}>${canCheckout ? "Mock 결제" : "결제 준비중"}</button>
       `;
       container.appendChild(row);
     }

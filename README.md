@@ -489,3 +489,14 @@ Firebase 설정 절차와 Firestore 저장 구조는 `docs/firebase-auth-setup.m
   - 배포 확인용 캐시 버전 기준을 `20260419e`로 갱신
 - 남은 문제
   - GitHub Pages 실제 화면에서 이메일 / Google 로그인 후 Firestore 저장 생성 확인 필요
+
+## 2026-04-19g GitHub Pages 상품 카탈로그 표시
+- 수정 목적: API 서버가 없는 Firebase / GitHub Pages 환경에서도 웹 결제 상품 목록이 상점에 보이도록 보정
+- 수정 파일: `js/api.js`, `js/shop.js`, `js/ui.js`, `index.html`, `main.js`, `README.md`, `DEPLOY_NOTE.txt`
+- 해결한 문제
+  - `/products` API가 없는 Pages 환경에서 `data/products/sample-products.json`을 정적 상품 카탈로그로 사용
+  - 활성 상태와 판매 기간 기준으로 웹 상품 노출
+  - 결제 서버가 없을 때 실패하는 Mock 결제 대신 `결제 준비중`으로 표시
+  - 배포 확인용 캐시 버전 기준을 `20260419f`로 갱신
+- 남은 문제
+  - 실제 결제 요청 / 검증 / 지급은 Cloud Functions 또는 별도 결제 서버 연결 필요

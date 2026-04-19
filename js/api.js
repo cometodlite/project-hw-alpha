@@ -12,6 +12,7 @@ import {
 } from "./firebase.js";
 
 const API_BASE_KEY = "project-hw-api-base";
+const STATIC_PRODUCTS_PATH = "./data/products/sample-products.json?v=20260419f";
 
 function inferLocalApiBase() {
   const host = globalThis.location?.hostname;
@@ -195,9 +196,26 @@ export async function restoreServerState() {
 }
 
 export async function listServerProducts() {
-  if (!isNodeApiEnabled()) return [];
+  if (!isNodeApiEnabled()) {
+    return listStaticProducts();
+  }
   const data = await apiFetch("/products");
   return data.products || [];
+}
+
+async function listStaticProducts() {
+  const response = await fetch(STATIC_PRODUCTS_PATH);
+  if (!response.ok) return [];
+  const products = await response.json().catch(() => []);
+  const now = Date.now();
+  return products.filter((product) => {
+    if (!product?.isActive) return false;
+    const startsAt = product.saleStartAt ? Date.parse(product.saleStartAt) : null;
+    const endsAt = product.saleEndAt ? Date.parse(product.saleEndAt) : null;
+    if (Number.isFinite(startsAt) && startsAt > now) return false;
+    if (Number.isFinite(endsAt) && endsAt < now) return false;
+    return true;
+  });
 }
 
 export async function checkoutServerProduct(productId) {

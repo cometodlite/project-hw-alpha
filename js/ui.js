@@ -19,6 +19,7 @@ import {
   getApiBase,
   getAuthState,
   isApiEnabled,
+  isNodeApiEnabled,
   loginAccount,
   loginWithGoogleAccount,
   logoutAccount,
@@ -314,6 +315,7 @@ function renderM5Shop() {
   });
   const webProducts = state.data.products || [];
   const authenticated = state.ui.auth.status === "authenticated";
+  const canCheckout = authenticated && isNodeApiEnabled();
   if (el.m5ShopSummary) {
     el.m5ShopSummary.textContent = `${visible.length}개 게임 상품 · 웹 상품 ${webProducts.length}개 · 코인 ${state.player.coin} · 블링 ${state.player.bling}`;
   }
@@ -342,7 +344,7 @@ function renderM5Shop() {
 
   const webItemsHtml = webProducts.length
     ? `
-      <div class="mobile-panel-summary">웹 결제 상품</div>
+      <div class="mobile-panel-summary">${canCheckout ? "웹 결제 상품" : "웹 결제 상품 · 결제 서버 준비 중"}</div>
       ${webProducts.map((product) => `
         <div class="mobile-shop-item">
           <div class="mobile-shop-copy">
@@ -353,7 +355,7 @@ function renderM5Shop() {
             <div>${escapeHtml(product.description)}</div>
             <small>${escapeHtml(product.currency)} ${Number(product.price).toLocaleString("ko-KR")}</small>
           </div>
-          <button data-m5-product-id="${escapeHtml(product.productId)}" ${authenticated ? "" : "disabled"}>${authenticated ? "Mock 결제" : "로그인 필요"}</button>
+          <button data-m5-product-id="${escapeHtml(product.productId)}" ${canCheckout ? "" : "disabled"}>${canCheckout ? "Mock 결제" : "결제 준비중"}</button>
         </div>
       `).join("")}
     `
