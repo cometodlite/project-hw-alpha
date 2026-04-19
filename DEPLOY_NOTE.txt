@@ -30,13 +30,15 @@ GitHub Pages 배포 안내
 - GitHub Pages 배포본은 Firebase 설정값이 없거나 실패하면 기존 로컬 저장으로 fallback합니다.
 - Firebase 설정값을 넣으면 이메일 회원가입 / 로그인 / Google 로그인과 Firestore 클라우드 저장을 사용합니다.
 - 별도 결제 서버를 붙일 때는 firebase-config.js의 window.HW_API_BASE에 서버 주소를 넣습니다.
+- 현재 Render 결제 서버 주소는 https://project-hw-alpha-api.onrender.com 입니다.
 - 결제 서버는 Firebase ID 토큰을 검증하려면 FIREBASE_PROJECT_ID=project-hw-6221d 환경값이 필요합니다.
 - 결제 / Mock 결제 기능은 별도 API 또는 Cloud Functions 배포 전까지 준비 상태로 표시합니다.
 
 배포 전 확인
-- index.html이 style.css?v=20260419g, main.js?v=20260419g를 참조하는지 확인합니다.
-- main.js의 data JSON 경로가 ?v=20260419g를 사용하는지 확인합니다.
+- index.html이 style.css?v=20260419h, main.js?v=20260419h를 참조하는지 확인합니다.
+- main.js의 data JSON 경로가 ?v=20260419h를 사용하는지 확인합니다.
 - firebase-config.js에 실제 Firebase 설정값을 넣었는지 확인합니다.
+- firebase-config.js의 window.HW_API_BASE가 Render 결제 서버 주소를 가리키는지 확인합니다.
 - 구형 모바일 네비(mobile-hcsim-nav, mobile-hcsim-reset-nav)가 다시 추가되지 않았는지 확인합니다.
 - 모바일은 STATUS / ACTION / BAG / SHOP / LOG 5패널 구조로 유지합니다.
 - iPad 가로와 PC / Mac 웹은 기존 데스크톱 대시보드 구조를 유지합니다.
@@ -54,3 +56,4 @@ GitHub Pages 배포 안내
 - 데스크톱에서는 계정 폼이 첫 화면을 밀어내지 않고 우상단 계정 버튼으로 열리는지 확인합니다.
 - 모바일 STATUS 패널 하단에서 계정 상태와 계정 연결 버튼이 보이는지 확인합니다.
 - API 서버가 없는 Pages 환경에서도 상점에 웹 결제 상품 목록이 보이고, 버튼은 `결제 준비중`으로 표시되는지 확인합니다.
+- Render 서버가 응답하지 않아도 게임 첫 화면이 멈추지 않고 Firebase / 로컬 저장 fallback이 유지되는지 확인합니다.

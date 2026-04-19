@@ -515,3 +515,15 @@ Firebase 설정 절차와 Firestore 저장 구조는 `docs/firebase-auth-setup.m
 - 남은 문제
   - 실제 운영 서버 호스팅 주소 선택 및 배포 필요
   - 실제 PG 연동, 웹훅 서명 검증, 환불 자동 처리 API는 다음 배치에서 구현 필요
+
+## 2026-04-19i Render 결제 서버 연결
+- 수정 목적: GitHub Pages 클라이언트를 Render에 배포한 PROJECT: HW API 서버와 연결
+- 수정 파일: `firebase-config.js`, `index.html`, `main.js`, `js/api.js`, `README.md`, `DEPLOY_NOTE.txt`
+- 해결한 문제
+  - `window.HW_API_BASE`를 `https://project-hw-alpha-api.onrender.com`으로 설정
+  - Pages 배포본이 Firebase 로그인 후 Render 결제 서버의 상품 / Mock 결제 / 지급 API를 사용할 수 있도록 연결
+  - Render 서버가 잠들었거나 응답이 늦을 때 게임 초기 로딩이 멈추지 않도록 API 타임아웃과 Firebase / 정적 상품 fallback 보강
+  - 배포 확인용 캐시 버전 기준을 `20260419h`로 갱신
+- 남은 문제
+  - Render 무료 인스턴스는 첫 요청이 느릴 수 있음
+  - 현재 DB는 SQLite 개발 구조라 실제 운영 결제 전에는 영구 DB 전환 필요

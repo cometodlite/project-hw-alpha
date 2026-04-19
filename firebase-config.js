@@ -8,4 +8,4 @@ window.HW_FIREBASE_CONFIG = {
   measurementId: "G-M9KG4JFG0F"
 };
 
-window.HW_API_BASE = "";
+window.HW_API_BASE = "https://project-hw-alpha-api.onrender.com";
