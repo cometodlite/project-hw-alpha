@@ -1,6 +1,14 @@
 import { state, addLog } from "./state.js";
 import { renderAll } from "./ui.js";
-import { checkoutServerProduct, completeMockPurchase, getAuthState, isNodeApiEnabled, listServerProducts, restoreServerState } from "./api.js";
+import {
+  checkoutServerProduct,
+  completeMockPurchase,
+  getAuthState,
+  isNodeApiEnabled,
+  listServerProducts,
+  restoreServerState,
+  saveServerPlayerState
+} from "./api.js";
 
 function isVisibleInShop(item) {
   if (item.id === "apple_seed") return state.player.unlocks.appleSeedUnlocked;
@@ -110,6 +118,7 @@ export async function buyServerProduct(productId) {
     }
     addLog("Mock 결제를 처리하는 중입니다.");
     renderAll();
+    await saveServerPlayerState();
     const checkout = await checkoutServerProduct(productId);
     const purchase = await completeMockPurchase(checkout);
     await restoreServerState();

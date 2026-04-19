@@ -44,6 +44,56 @@ export function createDefaultAccountRows(db, userId) {
     .run(userId, DEFAULT_WALLET.coin, DEFAULT_WALLET.freeBling, DEFAULT_WALLET.paidBling, now);
 }
 
+export function upsertFirebaseAccount(db, firebaseUser) {
+  const firebaseUid = String(firebaseUser.uid || "").trim();
+  if (!firebaseUid) throw new Error("Invalid Firebase user");
+
+  const userId = `firebase:${firebaseUid}`;
+  const email = normalizeFirebaseEmail(db, userId, firebaseUid, firebaseUser.email);
+  const displayName = String(firebaseUser.name || "").trim() || email.split("@")[0] || "HW Player";
+  const now = nowIso();
+
+  const run = db.transaction(() => {
+    const existing = db.prepare(`
+      SELECT * FROM users
+      WHERE user_id = ? OR firebase_uid = ?
+    `).get(userId, firebaseUid);
+
+    if (existing) {
+      db.prepare(`
+        UPDATE users
+        SET firebase_uid = ?,
+            auth_provider = 'firebase',
+            email = ?,
+            display_name = ?,
+            last_login_at = ?,
+            updated_at = ?
+        WHERE user_id = ?
+      `).run(firebaseUid, email, displayName, now, now, existing.user_id);
+      return db.prepare("SELECT * FROM users WHERE user_id = ?").get(existing.user_id);
+    }
+
+    db.prepare(`
+      INSERT INTO users (
+        user_id, public_user_code, firebase_uid, auth_provider, email, password_hash,
+        display_name, status, created_at, updated_at, last_login_at
+      ) VALUES (?, ?, ?, 'firebase', ?, 'firebase-auth', ?, 'active', ?, ?, ?)
+    `).run(userId, makePublicUserCode(), firebaseUid, email, displayName, now, now, now);
+    createDefaultAccountRows(db, userId);
+    return db.prepare("SELECT * FROM users WHERE user_id = ?").get(userId);
+  });
+
+  return run();
+}
+
+function normalizeFirebaseEmail(db, userId, firebaseUid, email) {
+  const fallback = `${firebaseUid}@firebase.local`;
+  const normalized = String(email || fallback).trim().toLowerCase();
+  const existing = db.prepare("SELECT user_id FROM users WHERE email = ?").get(normalized);
+  if (existing && existing.user_id !== userId) return fallback;
+  return normalized;
+}
+
 export function getWallet(db, userId) {
   const row = db.prepare("SELECT * FROM wallets WHERE user_id = ?").get(userId);
   if (!row) return null;

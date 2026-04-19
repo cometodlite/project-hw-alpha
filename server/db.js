@@ -36,6 +36,8 @@ export function migrate(db) {
     CREATE TABLE IF NOT EXISTS users (
       user_id TEXT PRIMARY KEY,
       public_user_code TEXT NOT NULL UNIQUE,
+      firebase_uid TEXT,
+      auth_provider TEXT NOT NULL DEFAULT 'password',
       email TEXT NOT NULL UNIQUE,
       password_hash TEXT NOT NULL,
       display_name TEXT NOT NULL,
@@ -157,4 +159,14 @@ export function migrate(db) {
       created_at TEXT NOT NULL
     );
   `);
+
+  addColumnIfMissing(db, "users", "firebase_uid", "TEXT");
+  addColumnIfMissing(db, "users", "auth_provider", "TEXT NOT NULL DEFAULT 'password'");
+  db.exec("CREATE UNIQUE INDEX IF NOT EXISTS idx_users_firebase_uid ON users(firebase_uid) WHERE firebase_uid IS NOT NULL;");
+}
+
+function addColumnIfMissing(db, tableName, columnName, columnDefinition) {
+  const columns = db.prepare(`PRAGMA table_info(${tableName})`).all();
+  if (columns.some((column) => column.name === columnName)) return;
+  db.exec(`ALTER TABLE ${tableName} ADD COLUMN ${columnName} ${columnDefinition};`);
 }

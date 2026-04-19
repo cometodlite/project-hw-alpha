@@ -1,6 +1,7 @@
 import { state } from "./state.js";
 import {
   getFirebaseAuthState,
+  getFirebaseIdToken,
   isFirebaseConfigured,
   loadFirebasePlayerState,
   loginFirebaseAccount,
@@ -12,7 +13,7 @@ import {
 } from "./firebase.js";
 
 const API_BASE_KEY = "project-hw-api-base";
-const STATIC_PRODUCTS_PATH = "./data/products/sample-products.json?v=20260419f";
+const STATIC_PRODUCTS_PATH = "./data/products/sample-products.json?v=20260419g";
 
 function inferLocalApiBase() {
   const host = globalThis.location?.hostname;
@@ -47,8 +48,8 @@ export function isNodeApiEnabled() {
 }
 
 export function getBackendMode() {
-  if (isFirebaseConfigured()) return "firebase";
   if (getApiBase()) return "api";
+  if (isFirebaseConfigured()) return "firebase";
   return "local";
 }
 
@@ -62,13 +63,18 @@ export function getBackendLabel() {
 async function apiFetch(path, options = {}) {
   const base = getApiBase();
   if (!base) throw new Error("HW API is not configured");
+  const headers = {
+    "Content-Type": "application/json",
+    ...(options.headers || {})
+  };
+  if (isFirebaseConfigured() && !headers.Authorization) {
+    const idToken = await getFirebaseIdToken();
+    if (idToken) headers.Authorization = `Bearer ${idToken}`;
+  }
   const response = await fetch(`${base}${path}`, {
+    ...options,
     credentials: "include",
-    headers: {
-      "Content-Type": "application/json",
-      ...(options.headers || {})
-    },
-    ...options
+    headers
   });
   const data = await response.json().catch(() => ({}));
   if (!response.ok) {
@@ -159,48 +165,55 @@ export function buildServerSavePayload() {
 }
 
 export async function loadServerPlayerState() {
-  if (isFirebaseConfigured()) {
-    const snapshot = await loadFirebasePlayerState();
-    return snapshot ? applyServerSnapshot(snapshot) : false;
-  }
-  if (!isNodeApiEnabled()) return false;
   const auth = await getAuthState();
   if (auth.status !== "authenticated") return false;
-  const snapshot = await apiFetch("/me/player-state");
-  return applyServerSnapshot(snapshot);
+  if (isNodeApiEnabled()) {
+    const snapshot = await apiFetch("/me/player-state");
+    return applyServerSnapshot(snapshot);
+  }
+  if (!isFirebaseConfigured()) return false;
+  const snapshot = await loadFirebasePlayerState();
+  return snapshot ? applyServerSnapshot(snapshot) : false;
 }
 
 export async function saveServerPlayerState() {
-  if (isFirebaseConfigured()) {
-    const snapshot = await saveFirebasePlayerState();
-    return snapshot ? applyServerSnapshot(snapshot) : false;
-  }
-  if (!isNodeApiEnabled()) return false;
   const auth = await getAuthState();
   if (auth.status !== "authenticated") return false;
-  const snapshot = await apiFetch("/me/player-state", {
-    method: "PUT",
-    body: JSON.stringify(buildServerSavePayload())
-  });
-  return applyServerSnapshot(snapshot);
+  if (isNodeApiEnabled()) {
+    const snapshot = await apiFetch("/me/player-state", {
+      method: "PUT",
+      body: JSON.stringify(buildServerSavePayload())
+    });
+    return applyServerSnapshot(snapshot);
+  }
+  if (!isFirebaseConfigured()) return false;
+  const snapshot = await saveFirebasePlayerState();
+  return snapshot ? applyServerSnapshot(snapshot) : false;
 }
 
 export async function restoreServerState() {
-  if (isFirebaseConfigured()) {
-    const snapshot = await restoreFirebaseState();
-    return snapshot ? applyServerSnapshot(snapshot) : false;
+  const auth = await getAuthState();
+  if (auth.status !== "authenticated") return false;
+  if (isNodeApiEnabled()) {
+    const snapshot = await apiFetch("/me/restore", { method: "POST", body: "{}" });
+    return applyServerSnapshot(snapshot);
   }
-  if (!isNodeApiEnabled()) return false;
-  const snapshot = await apiFetch("/me/restore", { method: "POST", body: "{}" });
-  return applyServerSnapshot(snapshot);
+  if (!isFirebaseConfigured()) return false;
+  const snapshot = await restoreFirebaseState();
+  return snapshot ? applyServerSnapshot(snapshot) : false;
 }
 
 export async function listServerProducts() {
   if (!isNodeApiEnabled()) {
     return listStaticProducts();
   }
-  const data = await apiFetch("/products");
-  return data.products || [];
+  try {
+    const data = await apiFetch("/products");
+    return data.products || [];
+  } catch (error) {
+    console.warn(error);
+    return listStaticProducts();
+  }
 }
 
 async function listStaticProducts() {

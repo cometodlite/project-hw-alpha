@@ -199,6 +199,11 @@ export async function getFirebaseAuthState() {
   return authFromFirebaseUser(user);
 }
 
+export async function getFirebaseIdToken(forceRefresh = false) {
+  const user = await getCurrentUser();
+  return user ? user.getIdToken(forceRefresh) : "";
+}
+
 export async function registerFirebaseAccount({ email, password, displayName }) {
   const context = await getFirebaseContext();
   if (!context) throw new Error("Firebase is not configured");

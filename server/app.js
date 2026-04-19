@@ -3,6 +3,7 @@ import cors from "cors";
 import express from "express";
 import session from "express-session";
 import { createDb, decodeJson, nowIso } from "./db.js";
+import { verifyFirebaseIdToken } from "./firebaseAuth.js";
 import {
   applyCurrencyChange,
   completeMockPayment,
@@ -16,7 +17,8 @@ import {
   makePublicUserCode,
   purchaseResponse,
   spendBling,
-  updatePlayerState
+  updatePlayerState,
+  upsertFirebaseAccount
 } from "./services.js";
 
 function toAuthState(user) {
@@ -34,18 +36,25 @@ function toAuthState(user) {
     status: "authenticated",
     userId: user.user_id,
     publicUserCode: user.public_user_code,
+    provider: user.auth_provider || "password",
     displayName: user.display_name,
     email: user.email,
     sessionExpiresAt: null
   };
 }
 
-function requireAuth(req, res, next) {
-  if (!req.session.userId) {
-    res.status(401).json({ error: "AUTH_REQUIRED" });
-    return;
+async function requireAuth(req, res, next) {
+  try {
+    const user = await resolveRequestUser(req);
+    if (!user) {
+      res.status(401).json({ error: "AUTH_REQUIRED" });
+      return;
+    }
+    req.authUserId = user.user_id;
+    next();
+  } catch (error) {
+    res.status(401).json({ error: "AUTH_REQUIRED", message: error.message });
   }
-  next();
 }
 
 function requireAdmin(req, res, next) {
@@ -62,17 +71,63 @@ function getSessionUser(db, req) {
   return db.prepare("SELECT * FROM users WHERE user_id = ? AND status = 'active'").get(req.session.userId) || null;
 }
 
+function getBearerToken(req) {
+  const header = req.get("authorization") || "";
+  const match = header.match(/^Bearer\s+(.+)$/i);
+  return match ? match[1].trim() : "";
+}
+
+async function resolveRequestUser(req) {
+  const db = req.app.locals.db;
+  const sessionUser = getSessionUser(db, req);
+  if (sessionUser) return sessionUser;
+
+  const token = getBearerToken(req);
+  const verifier = req.app.locals.firebaseTokenVerifier;
+  if (!token || !verifier) return null;
+
+  const firebaseUser = await verifier(token);
+  const user = upsertFirebaseAccount(db, firebaseUser);
+  req.authUserId = user.user_id;
+  return user;
+}
+
+function requestUserId(req) {
+  return req.authUserId || req.session.userId;
+}
+
+function buildCorsOrigin(clientOrigin) {
+  if (clientOrigin === true || clientOrigin === "*") return true;
+  const origins = String(clientOrigin || "")
+    .split(",")
+    .map((origin) => origin.trim())
+    .filter(Boolean);
+  if (!origins.length) return false;
+  return (origin, callback) => {
+    if (!origin || origins.includes(origin)) {
+      callback(null, true);
+      return;
+    }
+    callback(new Error("Not allowed by CORS"));
+  };
+}
+
 export function createApp(options = {}) {
   const app = express();
   const db = options.db || createDb(options.databasePath);
   const sessionSecret = options.sessionSecret || process.env.SESSION_SECRET || "dev-session-secret";
   const clientOrigin = options.clientOrigin ?? process.env.CLIENT_ORIGIN ?? true;
+  const firebaseProjectId = options.firebaseProjectId || process.env.FIREBASE_PROJECT_ID || "";
+  const firebaseTokenVerifier = options.firebaseTokenVerifier || (firebaseProjectId
+    ? ((token) => verifyFirebaseIdToken(token, { projectId: firebaseProjectId }))
+    : null);
 
   app.locals.db = db;
   app.locals.adminToken = options.adminToken || process.env.ADMIN_TOKEN || "dev-admin-token";
+  app.locals.firebaseTokenVerifier = firebaseTokenVerifier;
 
   app.use(cors({
-    origin: clientOrigin === "*" ? true : clientOrigin,
+    origin: buildCorsOrigin(clientOrigin),
     credentials: true
   }));
   app.use(express.json({ limit: "512kb" }));
@@ -118,9 +173,9 @@ export function createApp(options = {}) {
       const run = db.transaction(() => {
         db.prepare(`
           INSERT INTO users (
-            user_id, public_user_code, email, password_hash, display_name,
+            user_id, public_user_code, auth_provider, email, password_hash, display_name,
             status, created_at, updated_at
-          ) VALUES (?, ?, ?, ?, ?, 'active', ?, ?)
+          ) VALUES (?, ?, 'password', ?, ?, ?, 'active', ?, ?)
         `).run(userId, publicUserCode, email, passwordHash, displayName, now, now);
         createDefaultAccountRows(db, userId);
       });
@@ -166,8 +221,14 @@ export function createApp(options = {}) {
     });
   });
 
-  app.get("/auth/me", (req, res) => {
-    const user = getSessionUser(db, req);
+  app.get("/auth/me", async (req, res, next) => {
+    let user;
+    try {
+      user = await resolveRequestUser(req);
+    } catch (error) {
+      next(error);
+      return;
+    }
     if (!user) {
       res.json({ auth: toAuthState(null) });
       return;
@@ -176,19 +237,20 @@ export function createApp(options = {}) {
   });
 
   app.get("/me/player-state", requireAuth, (req, res) => {
-    res.json(getPlayerSnapshot(db, req.session.userId));
+    res.json(getPlayerSnapshot(db, requestUserId(req)));
   });
 
   app.put("/me/player-state", requireAuth, (req, res) => {
-    const snapshot = updatePlayerState(db, req.session.userId, req.body || {});
+    const snapshot = updatePlayerState(db, requestUserId(req), req.body || {});
     res.json(snapshot);
   });
 
   app.post("/me/restore", requireAuth, (req, res) => {
-    createRestoreEvent(db, req.session.userId);
+    const userId = requestUserId(req);
+    createRestoreEvent(db, userId);
     res.json({
-      ...getPlayerSnapshot(db, req.session.userId),
-      entitlements: listEntitlements(db, req.session.userId),
+      ...getPlayerSnapshot(db, userId),
+      entitlements: listEntitlements(db, userId),
       restoredAt: nowIso()
     });
   });
@@ -214,7 +276,7 @@ export function createApp(options = {}) {
         res.status(400).json({ error: "PRODUCT_AND_IDEMPOTENCY_REQUIRED" });
         return;
       }
-      const purchase = createCheckout(db, req.session.userId, { productId, idempotencyKey });
+      const purchase = createCheckout(db, requestUserId(req), { productId, idempotencyKey });
       res.status(201).json({ purchase });
     } catch (error) {
       next(error);
@@ -223,11 +285,12 @@ export function createApp(options = {}) {
 
   app.post("/payments/mock/complete", requireAuth, (req, res, next) => {
     try {
-      const purchase = completeMockPayment(db, req.session.userId, {
+      const userId = requestUserId(req);
+      const purchase = completeMockPayment(db, userId, {
         purchaseId: String(req.body.purchaseId || ""),
         mockPaymentToken: String(req.body.mockPaymentToken || "")
       });
-      res.json({ purchase, ...getPlayerSnapshot(db, req.session.userId) });
+      res.json({ purchase, ...getPlayerSnapshot(db, userId) });
     } catch (error) {
       next(error);
     }
@@ -235,7 +298,7 @@ export function createApp(options = {}) {
 
   app.get("/payments/:purchaseId", requireAuth, (req, res) => {
     const row = db.prepare("SELECT * FROM purchases WHERE purchase_id = ? AND user_id = ?")
-      .get(req.params.purchaseId, req.session.userId);
+      .get(req.params.purchaseId, requestUserId(req));
     if (!row) {
       res.status(404).json({ error: "PURCHASE_NOT_FOUND" });
       return;
@@ -245,12 +308,12 @@ export function createApp(options = {}) {
 
   app.post("/payments/:purchaseId/sync", requireAuth, (req, res) => {
     const row = db.prepare("SELECT * FROM purchases WHERE purchase_id = ? AND user_id = ?")
-      .get(req.params.purchaseId, req.session.userId);
+      .get(req.params.purchaseId, requestUserId(req));
     if (!row) {
       res.status(404).json({ error: "PURCHASE_NOT_FOUND" });
       return;
     }
-    res.json({ purchase: purchaseResponse(row), ...getPlayerSnapshot(db, req.session.userId) });
+    res.json({ purchase: purchaseResponse(row), ...getPlayerSnapshot(db, requestUserId(req)) });
   });
 
   app.get("/admin/users/:userId/purchases", requireAdmin, (req, res) => {

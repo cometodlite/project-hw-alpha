@@ -38,6 +38,8 @@ npm run dev
 localStorage.setItem("project-hw-api-base", "https://your-api.example.com");
 ```
 
+GitHub Pages에서 별도 결제 서버를 붙일 때는 `firebase-config.js`의 `window.HW_API_BASE`에 서버 주소를 넣습니다. Firebase 로그인 사용자는 클라이언트가 Firebase ID 토큰을 결제 서버에 전달하고, 결제 서버는 `FIREBASE_PROJECT_ID` 기준으로 토큰을 검증한 뒤 구매 / 지급 / 장부 API를 처리합니다.
+
 GitHub Pages 배포본은 정적 파일만 구동합니다. `firebase-config.js`에 Firebase 웹 앱 설정값을 넣으면 이메일 회원가입 / 로그인 / Google 로그인을 사용할 수 있습니다. Firebase 설정값이 비어 있거나 실패하면 생활 루프와 저장 / 불러오기는 브라우저 로컬 저장으로 동작합니다.
 
 Firebase 설정 절차와 Firestore 저장 구조는 `docs/firebase-auth-setup.md`에 정리되어 있습니다.
@@ -500,3 +502,16 @@ Firebase 설정 절차와 Firestore 저장 구조는 `docs/firebase-auth-setup.m
   - 배포 확인용 캐시 버전 기준을 `20260419f`로 갱신
 - 남은 문제
   - 실제 결제 요청 / 검증 / 지급은 Cloud Functions 또는 별도 결제 서버 연결 필요
+
+## 2026-04-19h Firebase Auth 결제 서버 브릿지
+- 수정 목적: GitHub Pages의 Firebase 로그인 사용자가 Express 결제 서버의 Mock 결제 / 지급 API를 사용할 수 있도록 인증 연결 준비
+- 수정 파일: `server/firebaseAuth.js`, `server/app.js`, `server/services.js`, `server/db.js`, `js/firebase.js`, `js/api.js`, `js/shop.js`, `firebase-config.js`, `.env.example`, `README.md`, `DEPLOY_NOTE.txt`, `docs/payment-api-spec.md`, `server/tests/api.test.js`
+- 해결한 문제
+  - 결제 서버가 Firebase ID 토큰을 검증하고 Firebase UID 기준 서버 계정을 자동 생성 / 동기화
+  - 클라이언트가 API 요청에 Firebase Bearer 토큰을 포함하도록 보강
+  - API 주소가 설정된 경우 결제 / 지급 / 장부와 서버 저장을 Express 서버 기준으로 사용
+  - Pages의 `firebase-config.js`에서 향후 결제 서버 URL을 고정할 수 있도록 `window.HW_API_BASE` 자리 추가
+  - 배포 확인용 캐시 버전 기준을 `20260419g`로 갱신
+- 남은 문제
+  - 실제 운영 서버 호스팅 주소 선택 및 배포 필요
+  - 실제 PG 연동, 웹훅 서명 검증, 환불 자동 처리 API는 다음 배치에서 구현 필요

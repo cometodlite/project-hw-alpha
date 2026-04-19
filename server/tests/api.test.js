@@ -137,3 +137,62 @@ test("mock checkout grants once and product list supports web products", async (
       assert.equal(res.body.wallet.paidBling, 1000);
     });
 });
+
+test("firebase bearer auth can use payment APIs without cookie session", async () => {
+  const app = createApp({
+    databasePath: ":memory:",
+    sessionSecret: "test-session-secret",
+    clientOrigin: true,
+    adminToken: "test-admin",
+    firebaseTokenVerifier: async (token) => {
+      assert.equal(token, "valid-firebase-token");
+      return {
+        uid: "firebase-user-1",
+        email: "firebase@example.com",
+        name: "Firebase Buyer"
+      };
+    }
+  });
+
+  const authHeader = "Bearer valid-firebase-token";
+  await request(app)
+    .get("/auth/me")
+    .set("authorization", authHeader)
+    .expect(200)
+    .expect((res) => {
+      assert.equal(res.body.auth.status, "authenticated");
+      assert.equal(res.body.auth.provider, "firebase");
+      assert.equal(res.body.auth.email, "firebase@example.com");
+    });
+
+  await request(app)
+    .put("/me/player-state")
+    .set("authorization", authHeader)
+    .send({
+      wallet: { coin: 777, freeBling: 30, paidBling: 0 },
+      inventory: { herb: 4 },
+      housing: { slots: ["plant", null, null, null] }
+    })
+    .expect(200);
+
+  const checkout = await request(app)
+    .post("/payments/checkout")
+    .set("authorization", authHeader)
+    .send({ productId: "bling_pack_1000_krw", idempotencyKey: "firebase-checkout-1" })
+    .expect(201);
+
+  await request(app)
+    .post("/payments/mock/complete")
+    .set("authorization", authHeader)
+    .send({
+      purchaseId: checkout.body.purchase.purchaseId,
+      mockPaymentToken: checkout.body.purchase.mockPaymentToken
+    })
+    .expect(200)
+    .expect((res) => {
+      assert.equal(res.body.purchase.status, "granted");
+      assert.equal(res.body.wallet.paidBling, 1000);
+      assert.equal(res.body.playerState.inventory.herb, 4);
+      assert.equal(res.body.playerState.housing.slots[0], "plant");
+    });
+});
